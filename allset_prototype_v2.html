@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Allset — Prototype V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:      #F3EFE6;
+      --cream-card: #EBE6DC;
+      --black:      #1A1816;
+      --gray:       #7A756D;
+      --light:      #B8B0A4;
+      --divider:    #DDD6C8;
+      --serif:      'Playfair Display', Georgia, serif;
+      --sans:       -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--sans);
+      background: #E2DDD5;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 28px 0 36px;
+    }
+
+    /* ── PHONE FRAME ── */
+    .phone {
+      width: 393px; height: 852px;
+      background: #111;
+      border-radius: 54px; padding: 13px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 48px 96px rgba(0,0,0,.5), inset 0 0 0 2px #333;
+      flex-shrink: 0; position: relative;
+    }
+    .phone-inner {
+      width: 100%; height: 100%; border-radius: 44px;
+      overflow: hidden; position: relative; background: var(--cream);
+    }
+    .di { /* dynamic island */
+      position: absolute; top: 13px; left: 50%; transform: translateX(-50%);
+      width: 126px; height: 37px; background: #111; border-radius: 20px; z-index: 300;
+    }
+    .sb { /* status bar */
+      position: absolute; top: 0; left: 0; right: 0; height: 58px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 28px 10px; z-index: 200; pointer-events: none;
+    }
+    .sb.dark { color: var(--black); }
+    .sb.light { color: #fff; }
+    .sb-time  { font-size: 15px; font-weight: 600; }
+    .sb-icons { display: flex; align-items: center; gap: 7px; }
+
+    /* ── SCREENS ── */
+    .screens { position: absolute; inset: 0; }
+    .screen {
+      display: none; position: absolute; inset: 0;
+      overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+      background: var(--cream);
+    }
+    .screen.active { display: block; animation: fwd .26s cubic-bezier(.25,.46,.45,.94); }
+    .screen.bk     { animation: bwd .26s cubic-bezier(.25,.46,.45,.94); }
+    @keyframes fwd { from { opacity:0; transform:translateX(28px) } to { opacity:1; transform:none } }
+    @keyframes bwd { from { opacity:0; transform:translateX(-28px) } to { opacity:1; transform:none } }
+
+    /* ── COMMON ── */
+    .pb96 { padding-bottom: 96px; }
+
+    /* Top bar */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 66px 24px 18px;
+    }
+    .wordmark { font-size: 10px; font-weight: 700; letter-spacing: 3.5px; color: var(--black); text-transform: uppercase; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--black);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+    }
+
+    /* Back header */
+    .nav-hdr {
+      display: flex; align-items: center; gap: 12px; padding: 66px 24px 18px;
+    }
+    .back {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--divider); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: var(--black); cursor: pointer; line-height: 1;
+      padding-bottom: 1px;
+    }
+    .back:active { background: var(--divider); }
+    .hdr-title  { font-size: 16px; font-weight: 600; color: var(--black); flex: 1; }
+    .hdr-action { font-size: 13px; color: var(--gray); cursor: pointer; }
+
+    /* Section label */
+    .sec-lbl {
+      padding: 22px 24px 10px;
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--light);
+    }
+
+    /* Thin divider */
+    .div  { border-top: 1px solid var(--divider); }
+    .divv { height: 1px; background: var(--divider); }
+
+    /* Bottom nav */
+    .bnav {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 78px;
+      background: var(--cream); border-top: 1px solid var(--divider);
+      display: flex; align-items: flex-start; padding-top: 16px; z-index: 100;
+    }
+    .ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+    .ni svg { opacity: .3; }
+    .ni.on svg { opacity: 1; }
+    .ni-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--light); }
+    .ni.on .ni-lbl { color: var(--black); }
+
+    /* Action button */
+    .btn {
+      display: block; width: calc(100% - 48px); margin: 20px 24px 0;
+      background: var(--black); color: #fff; border: none; border-radius: 10px;
+      padding: 15px; font-size: 14px; font-weight: 700; letter-spacing: .3px;
+      text-align: center; cursor: pointer; font-family: inherit; transition: opacity .15s;
+    }
+    .btn:active { opacity: .75; }
+    .btn.ghost {
+      background: transparent; color: var(--black);
+      border: 1px solid var(--divider); margin-top: 10px;
+    }
+
+    /* Toast */
+    .toast {
+      position: absolute; bottom: 90px; left: 20px; right: 20px;
+      background: var(--black); color: #fff; border-radius: 10px;
+      padding: 13px 18px; font-size: 13px; font-weight: 600; text-align: center;
+      z-index: 600; opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ════ S1 — SPLASH ════ */
+    #s1 {
+      background: var(--black);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .sp-mark { font-size: 10px; font-weight: 700; letter-spacing: 5px; color: rgba(255,255,255,.4); text-transform: uppercase; margin-bottom: 14px; }
+    .sp-city { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 60px; color: #fff; letter-spacing: -.5px; line-height: 1; }
+    .sp-sub  { font-size: 14px; color: rgba(255,255,255,.35); margin-top: 12px; text-align: center; line-height: 1.7; max-width: 210px; }
+    .sp-cta  {
+      margin-top: 64px; padding: 14px 38px; border: 1px solid rgba(255,255,255,.25);
+      border-radius: 8px; background: transparent; color: rgba(255,255,255,.8);
+      font-size: 13px; font-weight: 700; letter-spacing: .8px; cursor: pointer;
+      font-family: inherit; transition: border-color .15s;
+    }
+    .sp-cta:active { border-color: rgba(255,255,255,.6); }
+
+    /* ════ S2 — HOME ════ */
+    .feat-card {
+      margin: 4px 24px 0; border-radius: 16px; overflow: hidden;
+      height: 218px; position: relative; cursor: pointer;
+      box-shadow: 0 10px 36px rgba(0,0,0,.22); transition: transform .15s;
+    }
+    .feat-card:active { transform: scale(.975); }
+    .fc-photo { position: absolute; inset: 0; }
+    .ph-bcn  { background: linear-gradient(155deg, #2E2010 0%, #6B4822 40%, #9C7040 60%, #3D2610 80%, #180E04 100%); }
+    .ph-alps { background: linear-gradient(155deg, #1A2535 0%, #2C4260 40%, #3E5A7A 60%, #1C3048 80%, #0D1520 100%); }
+    .fc-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.78) 0%, rgba(0,0,0,.05) 55%); }
+    .fc-tag {
+      position: absolute; top: 14px; left: 14px;
+      background: rgba(255,255,255,.16); backdrop-filter: blur(8px) saturate(120%);
+      border-radius: 5px; padding: 5px 9px;
+      font-size: 9px; font-weight: 700; letter-spacing: 1.4px; color: #fff; text-transform: uppercase;
+    }
+    .fc-body { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px 18px; }
+    .fc-eye  { font-size: 9px; font-weight: 700; letter-spacing: 1.6px; color: rgba(255,255,255,.5); text-transform: uppercase; margin-bottom: 4px; }
+    .fc-city { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 42px; color: #fff; letter-spacing: -.4px; line-height: 1; }
+
+    .trip-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 17px 24px; border-bottom: 1px solid var(--divider); cursor: pointer;
+    }
+    .trip-row:active { background: rgba(0,0,0,.02); }
+    .tr-name { font-size: 15px; font-weight: 600; color: var(--black); }
+    .tr-sub  { font-size: 13px; color: var(--gray); margin-top: 3px; }
+    .tr-arr  { font-size: 16px; color: var(--light); }
+
+    .arch-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 15px 24px; border-bottom: 1px solid var(--divider); cursor: pointer;
+    }
+    .arch-item:active { background: rgba(0,0,0,.02); }
+    .ai-name { font-size: 14px; font-weight: 600; color: var(--black); }
+    .ai-date { font-size: 12px; color: var(--gray); margin-top: 3px; }
+    .ai-tag  {
+      font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--light); border: 1px solid var(--divider); border-radius: 4px; padding: 4px 8px;
+    }
+
+    /* ════ S3 — CREATE ════ */
+    .form-g   { padding: 0 24px; margin-bottom: 16px; }
+    .form-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--light); margin-bottom: 8px; }
+    .form-inp {
+      width: 100%; background: #fff; border: 1px solid var(--divider); border-radius: 10px;
+      padding: 14px 16px; font-size: 15px; color: var(--black); font-family: inherit;
+      outline: none; -webkit-appearance: none; transition: border-color .15s;
+    }
+    .form-inp::placeholder { color: var(--light); }
+    .form-inp:focus { border-color: var(--gray); }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .type-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+    .type-opt {
+      background: #fff; border: 1px solid var(--divider); border-radius: 10px;
+      padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+      transition: all .15s;
+    }
+    .type-opt.sel { border-color: var(--black); background: var(--black); }
+    .type-opt-lbl { font-size: 14px; font-weight: 600; color: var(--black); }
+    .type-opt.sel .type-opt-lbl { color: #fff; }
+
+    /* ════ S4 — TRIP DETAIL ════ */
+    .th-wrap { height: 272px; position: relative; overflow: hidden; }
+    .th-back {
+      position: absolute; top: 62px; left: 20px; z-index: 10;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,.14); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: #fff; cursor: pointer; line-height: 1; padding-bottom: 1px;
+    }
+    .th-shr {
+      position: absolute; top: 66px; right: 24px; z-index: 10;
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      color: rgba(255,255,255,.6); cursor: pointer;
+    }
+    .th-ov  { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.08) 55%); }
+    .th-cnt { position: absolute; bottom: 22px; left: 22px; right: 22px; }
+    .th-eye { font-size: 9px; font-weight: 700; letter-spacing: 1.6px; color: rgba(255,255,255,.5); text-transform: uppercase; margin-bottom: 5px; }
+    .th-cty { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 46px; color: #fff; letter-spacing: -.4px; line-height: 1; }
+    .th-dt  { font-size: 13px; color: rgba(255,255,255,.5); margin-top: 6px; }
+
+    .prog-strip {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--divider);
+    }
+    .ps-nums { display: flex; align-items: baseline; gap: 3px; }
+    .ps-big  { font-size: 22px; font-weight: 700; color: var(--black); }
+    .ps-sep  { font-size: 16px; color: var(--light); }
+    .ps-tot  { font-size: 16px; color: var(--light); }
+    .ps-lbl  { font-size: 12px; color: var(--gray); flex: 1; padding-left: 4px; }
+    .ps-bar  { flex: 2; height: 2px; background: var(--divider); border-radius: 1px; overflow: hidden; }
+    .ps-fill { height: 100%; background: var(--black); border-radius: 1px; }
+
+    .step-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 15px 24px; border-bottom: 1px solid var(--divider);
+      cursor: pointer; background: #fff;
+    }
+    .step-item:active { background: #FAFAF7; }
+    .si-emoji { font-size: 18px; flex-shrink: 0; line-height: 1; width: 24px; text-align: center; }
+    .si-info { flex: 1; }
+    .si-name { font-size: 15px; font-weight: 600; color: var(--black); }
+    .si-sub  { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .si-st   { font-size: 11px; font-weight: 700; letter-spacing: .3px; }
+    .st-done { color: var(--gray); }
+    .st-part { color: var(--black); }
+    .st-none { color: var(--light); }
+    .si-arr  { font-size: 14px; color: var(--light); }
+
+    .add-row {
+      padding: 16px 24px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--divider); cursor: pointer; background: #fff;
+    }
+    .add-row:active { background: #FAFAF7; }
+    .add-plus { font-size: 20px; color: var(--light); line-height: 1; }
+    .add-txt  { font-size: 14px; color: var(--gray); font-weight: 500; }
+
+    /* ════ S5 — ADD STEP ════ */
+    .type-list { padding: 0 24px; }
+    .tl-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 0; border-bottom: 1px solid var(--divider); cursor: pointer;
+    }
+    .tl-row:last-child { border-bottom: none; }
+    .tl-row:active { opacity: .5; }
+    .tl-left { }
+    .tl-name { font-size: 16px; font-weight: 600; color: var(--black); }
+    .tl-sub  { font-size: 13px; color: var(--gray); margin-top: 3px; }
+    .tl-badge { font-size: 11px; color: var(--light); font-weight: 600; letter-spacing: .3px; }
+    .tl-arr  { font-size: 16px; color: var(--light); }
+
+    /* ════ S6 — CHECKLIST ════ */
+    .cl-hero {
+      padding: 0 24px 20px; background: #fff; border-bottom: 1px solid var(--divider);
+    }
+    .cl-type { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--light); margin-bottom: 7px; }
+    .cl-title { font-size: 21px; font-weight: 700; color: var(--black); letter-spacing: -.3px; }
+    .cl-sub   { font-size: 13px; color: var(--gray); margin-top: 3px; }
+    .cl-prog-row { display: flex; align-items: baseline; gap: 5px; margin-top: 18px; }
+    .clp-big   { font-size: 28px; font-weight: 700; color: var(--black); }
+    .clp-slash { font-size: 18px; color: var(--light); }
+    .clp-tot   { font-size: 18px; color: var(--light); }
+    .clp-lbl   { font-size: 13px; color: var(--gray); padding-left: 4px; }
+
+    .cl-list { background: #fff; }
+    .cl-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 24px; border-bottom: 1px solid var(--divider); cursor: pointer;
+    }
+    .cl-item:active { background: #FAFAF7; }
+    .cb {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 1.5px solid var(--divider); flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center; transition: all .15s;
+    }
+    .cb.on { background: var(--black); border-color: var(--black); }
+    .cb-mk  { display: none; color: #fff; font-size: 13px; font-weight: 800; line-height: 1; }
+    .cb.on .cb-mk { display: block; }
+    .cl-txt { font-size: 14px; color: var(--black); line-height: 1.5; flex: 1; transition: color .15s; }
+    .cl-txt.done { color: var(--light); text-decoration: line-through; }
+
+    .cl-add-row {
+      padding: 15px 24px; display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--divider); cursor: pointer;
+      font-size: 14px; color: var(--gray);
+    }
+    .cl-add-row:active { color: var(--black); }
+
+    /* ════ S7 — SHARE ════ */
+    .link-box {
+      margin: 0 24px; background: #fff; border: 1px solid var(--divider);
+      border-radius: 12px; padding: 16px;
+    }
+    .lb-lbl  { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--light); margin-bottom: 9px; }
+    .lb-url  { font-size: 13px; color: var(--gray); font-family: 'Courier New', monospace; word-break: break-all; }
+    .lb-copy {
+      margin-top: 13px; background: var(--black); color: #fff; border-radius: 7px;
+      padding: 10px 16px; font-size: 12px; font-weight: 700; cursor: pointer;
+      display: inline-block; letter-spacing: .4px; transition: opacity .15s;
+    }
+    .lb-copy:active { opacity: .75; }
+
+    .shr-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 17px 24px; border-bottom: 1px solid var(--divider);
+      background: #fff; cursor: pointer;
+    }
+    .shr-row:active { background: #FAFAF7; }
+    .shr-left { display: flex; align-items: center; gap: 14px; }
+    .shr-ic   { width: 36px; height: 36px; border-radius: 9px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .shr-name { font-size: 15px; font-weight: 600; color: var(--black); }
+    .shr-sub  { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .shr-arr  { font-size: 16px; color: var(--light); }
+
+    .preview-card {
+      margin: 0 24px; background: #fff; border: 1px solid var(--divider); border-radius: 12px; overflow: hidden; cursor: pointer;
+    }
+    .preview-card:active { opacity: .8; }
+    .pc-top { background: var(--black); padding: 14px 16px; }
+    .pc-from { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 5px; }
+    .pc-city { font-family: var(--serif); font-style: italic; font-size: 20px; font-weight: 400; color: #fff; }
+    .pc-dt   { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 2px; }
+    .pc-bot  { padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
+    .pc-lnk  { font-size: 13px; font-weight: 600; color: var(--black); }
+    .pc-sub  { font-size: 12px; color: var(--gray); }
+
+    /* ════ S8 — PARTNER ════ */
+    .ptnr-hero {
+      background: var(--black); padding: 62px 24px 24px; color: #fff;
+    }
+    .ph-from { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: 10px; }
+    .ph-city { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 40px; color: #fff; letter-spacing: -.4px; line-height: 1; }
+    .ph-dt   { font-size: 14px; color: rgba(255,255,255,.45); margin-top: 6px; }
+
+    .ptnr-prog { padding: 20px 24px; border-bottom: 1px solid var(--divider); background: #fff; }
+    .pp-lbl  { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--light); margin-bottom: 12px; }
+    .pp-nums { display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px; }
+    .pp-big  { font-size: 34px; font-weight: 700; color: var(--black); }
+    .pp-of   { font-size: 20px; color: var(--light); }
+    .pp-sub  { font-size: 13px; color: var(--gray); }
+    .pp-bar  { height: 2px; background: var(--divider); border-radius: 1px; overflow: hidden; }
+    .pp-fill { height: 100%; background: var(--black); border-radius: 1px; }
+
+    .ptnr-sec { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--light); padding: 18px 24px 8px; background: #fff; }
+    .ptnr-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 24px; border-bottom: 1px solid var(--divider);
+      background: #fff; cursor: pointer;
+    }
+    .ptnr-item:active { background: #FAFAF7; }
+    .pi-txt { font-size: 14px; color: var(--black); flex: 1; }
+    .pi-txt.done { color: var(--light); text-decoration: line-through; }
+
+    .ptnr-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+      background: var(--cream); border-top: 1px solid var(--divider);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pf-back { font-size: 13px; font-weight: 600; color: var(--gray); cursor: pointer; }
+    .pf-back:active { color: var(--black); }
+
+    /* ── OUTSIDE PHONE ── */
+    .meta { margin-top: 20px; text-align: center; font-family: -apple-system, system-ui, sans-serif; }
+    .sc-name { font-size: 13px; font-weight: 600; color: #6B6560; letter-spacing: .3px; }
+    .sc-hint { font-size: 12px; color: #A09A94; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="phone">
+ <div class="phone-inner">
+  <div class="di"></div>
+
+  <!-- Status bar -->
+  <div class="sb dark" id="sb">
+    <span class="sb-time">10:41</span>
+    <div class="sb-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor">
+        <rect x="0" y="5" width="3" height="6" rx="1"/><rect x="4.5" y="3.5" width="3" height="7.5" rx="1"/>
+        <rect x="9" y="1.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 10a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" fill="currentColor"/>
+        <path d="M2.5 6.2C4 4.6 5.9 3.7 8 3.7s4 .9 5.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M0 3.5C2 1.5 4.8.5 8 .5s6 1 8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+        <rect x=".5" y=".5" width="21" height="12" rx="3.5" stroke="currentColor" stroke-opacity=".35"/>
+        <rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/>
+        <path d="M23.5 4.5v4a2 2 0 000-4z" fill="currentColor" fill-opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="screens">
+
+   <!-- ════ S1 — SPLASH ════ -->
+   <div class="screen active" id="s1" onclick="go('s2','fwd')">
+     <div class="sp-mark">Allset</div>
+     <div class="sp-city">Voyager.</div>
+     <div class="sp-sub">Organisez votre voyage famille — sans repartir de zéro.</div>
+     <button class="sp-cta">Commencer</button>
+   </div>
+
+   <!-- ════ S2 — HOME ════ -->
+   <div class="screen" id="s2">
+     <div class="pb96">
+       <div class="topbar">
+         <div class="wordmark">Allset</div>
+         <div class="avatar">M</div>
+       </div>
+
+       <div style="padding:0 24px 20px;">
+         <div style="font-size:32px;font-weight:700;color:var(--black);letter-spacing:-.6px;line-height:1.1;">Mes voyages</div>
+         <div style="font-size:14px;color:var(--gray);margin-top:5px;">1 à venir · 2 archivés</div>
+       </div>
+
+       <!-- Featured card -->
+       <div class="feat-card" onclick="go('s4','fwd')">
+         <div class="fc-photo ph-bcn"></div>
+         <div class="fc-overlay"></div>
+         <div class="fc-tag">À venir — 14 juil.</div>
+         <div class="fc-body">
+           <div class="fc-eye">Famille · 4 voyageurs</div>
+           <div class="fc-city">Barcelone</div>
+         </div>
+       </div>
+
+       <div class="trip-row" onclick="go('s4','fwd')" style="background:#fff;margin-top:12px;">
+         <div>
+           <div class="tr-name">Vacances d'été</div>
+           <div class="tr-sub">14 → 21 juil. · 4 étapes</div>
+         </div>
+         <div class="tr-arr">→</div>
+       </div>
+
+       <div class="sec-lbl">Archives</div>
+
+       <div class="arch-item" style="background:#fff;">
+         <div>
+           <div class="ai-name">Week-end à Lisbonne</div>
+           <div class="ai-date">Avr. 2026</div>
+         </div>
+         <div class="ai-tag">Terminé</div>
+       </div>
+       <div class="arch-item" style="background:#fff;">
+         <div>
+           <div class="ai-name">Porto — famil.</div>
+           <div class="ai-date">Fév. 2026</div>
+         </div>
+         <div class="ai-tag">Terminé</div>
+       </div>
+     </div>
+
+     <div class="bnav">
+       <div class="ni on">
+         <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+           <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.6"/>
+         </svg>
+         <div class="ni-lbl">Voyages</div>
+       </div>
+       <div class="ni" onclick="go('s3','fwd')">
+         <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+           <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+           <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+         </svg>
+         <div class="ni-lbl">Créer</div>
+       </div>
+       <div class="ni">
+         <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+           <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+           <path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+         </svg>
+         <div class="ni-lbl">Profil</div>
+       </div>
+     </div>
+   </div>
+
+   <!-- ════ S3 — CREATE TRIP ════ -->
+   <div class="screen" id="s3">
+     <div class="pb96">
+       <div class="nav-hdr">
+         <div class="back" onclick="back()">‹</div>
+         <div class="hdr-title">Nouveau voyage</div>
+       </div>
+
+       <div class="form-g">
+         <div class="form-lbl">Titre</div>
+         <input class="form-inp" placeholder="Ex : Barcelone été 2026" value="">
+       </div>
+       <div class="form-g">
+         <div class="form-lbl">Destination</div>
+         <input class="form-inp" placeholder="Ville, pays…" value="">
+       </div>
+       <div class="form-g">
+         <div class="form-lbl">Dates</div>
+         <div class="two-col">
+           <input class="form-inp" placeholder="Départ" value="14/07/2026">
+           <input class="form-inp" placeholder="Retour"  value="21/07/2026">
+         </div>
+       </div>
+       <div class="form-g">
+         <div class="form-lbl">Participants</div>
+         <input class="form-inp" value="Marie, Thomas, Emma (8), Léo (5)">
+       </div>
+       <div class="form-g">
+         <div class="form-lbl">Type</div>
+         <div class="type-grid">
+           <div class="type-opt sel" onclick="selType(this)"><span>🏖</span><span class="type-opt-lbl">Plage</span></div>
+           <div class="type-opt" onclick="selType(this)"><span>🏙</span><span class="type-opt-lbl">City trip</span></div>
+           <div class="type-opt" onclick="selType(this)"><span>⛷</span><span class="type-opt-lbl">Montagne</span></div>
+           <div class="type-opt" onclick="selType(this)"><span>🌿</span><span class="type-opt-lbl">Nature</span></div>
+         </div>
+       </div>
+       <button class="btn" onclick="go('s4','fwd')">Créer le voyage →</button>
+     </div>
+   </div>
+
+   <!-- ════ S4 — TRIP DETAIL ════ -->
+   <div class="screen" id="s4">
+     <div style="padding-bottom:96px;">
+       <!-- Hero photo -->
+       <div class="th-wrap">
+         <div class="fc-photo ph-bcn" style="position:absolute;inset:0;"></div>
+         <div class="th-ov"></div>
+         <div class="th-back" onclick="back()">‹</div>
+         <div class="th-shr" onclick="go('s7','fwd')">Partager</div>
+         <div class="th-cnt">
+           <div class="th-eye">Famille · 4 voyageurs</div>
+           <div class="th-cty">Barcelone</div>
+           <div class="th-dt">14 → 21 juillet 2026 · 7 nuits</div>
+         </div>
+       </div>
+
+       <!-- Progress -->
+       <div class="prog-strip">
+         <div class="ps-nums">
+           <span class="ps-big">12</span>
+           <span class="ps-sep">/</span>
+           <span class="ps-tot">22</span>
+         </div>
+         <div class="ps-lbl">éléments validés</div>
+         <div class="ps-bar"><div class="ps-fill" style="width:55%"></div></div>
+       </div>
+
+       <div class="sec-lbl" style="background:#fff;">Étapes</div>
+
+       <!-- Vol — done -->
+       <div class="step-item" onclick="go('s6','fwd')">
+         <div class="si-emoji">✅</div>
+         <div class="si-info">
+           <div class="si-name">Vol Paris → Barcelone</div>
+           <div class="si-sub">Air France · CDG → BCN · 14 juil. 08:35</div>
+         </div>
+         <div class="si-st st-done">Calé</div>
+         <div class="si-arr">›</div>
+       </div>
+
+       <!-- Hôtel — partial -->
+       <div class="step-item" onclick="toast('Hôtel — 3 items restants')">
+         <div class="si-emoji">⚡</div>
+         <div class="si-info">
+           <div class="si-name">Hôtel Barceloneta</div>
+           <div class="si-sub">3 / 5 · Arrivée 14 jul.</div>
+         </div>
+         <div class="si-st st-part">En cours</div>
+         <div class="si-arr">›</div>
+       </div>
+
+       <!-- Location — none -->
+       <div class="step-item" onclick="toast('Location voiture — aucun item validé')">
+         <div class="si-emoji">❌</div>
+         <div class="si-info">
+           <div class="si-name">Location voiture</div>
+           <div class="si-sub">0 / 5 · Non commencé</div>
+         </div>
+         <div class="si-st st-none">Manquant</div>
+         <div class="si-arr">›</div>
+       </div>
+
+       <!-- Logement — done -->
+       <div class="step-item" onclick="toast('Logement — tout est calé ✓')">
+         <div class="si-emoji">✅</div>
+         <div class="si-info">
+           <div class="si-name">Logement Airbnb</div>
+           <div class="si-sub">5 / 5 · Gracia, Barcelone</div>
+         </div>
+         <div class="si-st st-done">Calé</div>
+         <div class="si-arr">›</div>
+       </div>
+
+       <div class="add-row" onclick="go('s5','fwd')">
+         <div class="add-plus">+</div>
+         <div class="add-txt">Ajouter une étape…</div>
+       </div>
+
+       <div style="background:#fff;padding-bottom:4px;">
+         <button class="btn" onclick="go('s7','fwd')">Partager avec Thomas →</button>
+       </div>
+     </div>
+   </div>
+
+   <!-- ════ S5 — ADD STEP ════ -->
+   <div class="screen" id="s5">
+     <div class="pb96">
+       <div class="nav-hdr">
+         <div class="back" onclick="back()">‹</div>
+         <div class="hdr-title">Ajouter une étape</div>
+       </div>
+
+       <div style="padding:0 24px 16px;">
+         <div style="font-size:13px;color:var(--gray);line-height:1.6;">Sélectionnez un type — la checklist correspondante est générée automatiquement.</div>
+       </div>
+
+       <div class="type-list" style="background:#fff;border-top:1px solid var(--divider);border-bottom:1px solid var(--divider);">
+         <div class="tl-row" onclick="go('s6','fwd')">
+           <div class="tl-left">
+             <div>
+               <div class="tl-name">Vol</div>
+               <div class="tl-sub">8 items générés automatiquement</div>
+             </div>
+           </div>
+           <div style="display:flex;align-items:center;gap:12px;">
+             <div class="tl-badge">8 items</div>
+             <div class="tl-arr">›</div>
+           </div>
+         </div>
+         <div class="tl-row" onclick="toast('Checklist Hôtel créée — 5 items')">
+           <div class="tl-left">
+             <div>
+               <div class="tl-name">Hôtel</div>
+               <div class="tl-sub">Check-in, annulation, parking…</div>
+             </div>
+           </div>
+           <div style="display:flex;align-items:center;gap:12px;">
+             <div class="tl-badge">5 items</div>
+             <div class="tl-arr">›</div>
+           </div>
+         </div>
+         <div class="tl-row" onclick="toast('Checklist Location voiture créée — 5 items')">
+           <div class="tl-left">
+             <div>
+               <div class="tl-name">Location voiture</div>
+               <div class="tl-sub">Réservation, assurance, siège enfant…</div>
+             </div>
+           </div>
+           <div style="display:flex;align-items:center;gap:12px;">
+             <div class="tl-badge">5 items</div>
+             <div class="tl-arr">›</div>
+           </div>
+         </div>
+         <div class="tl-row" onclick="toast('Checklist Logement créée — 5 items')">
+           <div class="tl-left">
+             <div>
+               <div class="tl-name">Logement</div>
+               <div class="tl-sub">Airbnb, gîte, accès, hôte…</div>
+             </div>
+           </div>
+           <div style="display:flex;align-items:center;gap:12px;">
+             <div class="tl-badge">5 items</div>
+             <div class="tl-arr">›</div>
+           </div>
+         </div>
+         <div class="tl-row" onclick="toast('Checklist Transfert créée — 4 items')">
+           <div class="tl-left">
+             <div>
+               <div class="tl-name">Transfert</div>
+               <div class="tl-sub">Taxi, navette, réservation…</div>
+             </div>
+           </div>
+           <div style="display:flex;align-items:center;gap:12px;">
+             <div class="tl-badge">4 items</div>
+             <div class="tl-arr">›</div>
+           </div>
+         </div>
+         <div class="tl-row" onclick="toast('Étape libre créée')">
+           <div class="tl-left">
+             <div>
+               <div class="tl-name">Autre</div>
+               <div class="tl-sub">Liste libre, items personnalisés</div>
+             </div>
+           </div>
+           <div class="tl-arr">›</div>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- ════ S6 — CHECKLIST VOL ════ -->
+   <div class="screen" id="s6">
+     <div style="padding-bottom:96px;">
+       <div class="nav-hdr" style="background:#fff;border-bottom:1px solid var(--divider);">
+         <div class="back" onclick="back()">‹</div>
+         <div class="hdr-title">Checklist</div>
+         <div class="hdr-action">Modifier</div>
+       </div>
+
+       <div class="cl-hero">
+         <div class="cl-type">Vol</div>
+         <div class="cl-title">Paris → Barcelone</div>
+         <div class="cl-sub">Air France · CDG → BCN · 14 juil. 08:35</div>
+         <div class="cl-prog-row">
+           <div class="clp-big" id="cl-done-ct">5</div>
+           <div class="clp-slash">/</div>
+           <div class="clp-tot">8</div>
+           <div class="clp-lbl">éléments validés</div>
+         </div>
+       </div>
+
+       <div class="cl-list">
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb on"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt done">Billet confirmé (n° réservation + email reçu)</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb on"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt done">Bagage soute réservé (option payante)</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb on"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt done">Check-in en ligne fait</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb on"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt done">Carte d'embarquement téléchargée</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb on"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt done">Documents enfants vérifiés (CNI + expiration)</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt">Visas &amp; autorisations vérifiés (ESTA, eTA…)</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt">Autorisation de sortie du territoire (parent seul)</div>
+         </div>
+         <div class="cl-item" onclick="tick(this)">
+           <div class="cb"><span class="cb-mk">✓</span></div>
+           <div class="cl-txt">Heure de présentation aéroport calée</div>
+         </div>
+         <div class="cl-add-row" onclick="toast('Item ajouté')">+ &nbsp;Ajouter un item</div>
+       </div>
+     </div>
+   </div>
+
+   <!-- ════ S7 — SHARE ════ -->
+   <div class="screen" id="s7">
+     <div class="pb96">
+       <div class="nav-hdr">
+         <div class="back" onclick="back()">‹</div>
+         <div class="hdr-title">Partager</div>
+       </div>
+
+       <div class="link-box">
+         <div class="lb-lbl">Lien de partage</div>
+         <div class="lb-url">allset.app/voyage/bcn-ete-2026</div>
+         <div class="lb-copy" onclick="toast('Lien copié ✓')">Copier le lien</div>
+       </div>
+
+       <div class="sec-lbl">Envoyer via</div>
+
+       <div style="background:#fff;border-top:1px solid var(--divider);border-bottom:1px solid var(--divider);">
+         <div class="shr-row" onclick="toast('Ouverture WhatsApp…')">
+           <div class="shr-left">
+             <div class="shr-ic">💬</div>
+             <div>
+               <div class="shr-name">WhatsApp</div>
+               <div class="shr-sub">Envoyer à Thomas</div>
+             </div>
+           </div>
+           <div class="shr-arr">›</div>
+         </div>
+         <div class="shr-row" onclick="toast('Ouverture Messages…')">
+           <div class="shr-left">
+             <div class="shr-ic" style="font-size:16px;">SMS</div>
+             <div>
+               <div class="shr-name">Message</div>
+               <div class="shr-sub">Envoyer par SMS</div>
+             </div>
+           </div>
+           <div class="shr-arr">›</div>
+         </div>
+         <div class="shr-row" onclick="toast('Ouverture Mail…')">
+           <div class="shr-left">
+             <div class="shr-ic">✉️</div>
+             <div>
+               <div class="shr-name">Email</div>
+               <div class="shr-sub">Envoyer par email</div>
+             </div>
+           </div>
+           <div class="shr-arr">›</div>
+         </div>
+       </div>
+
+       <div class="sec-lbl">Aperçu vue partenaire</div>
+       <div class="preview-card" onclick="go('s8','fwd')">
+         <div class="pc-top">
+           <div class="pc-from">Partagé par Marie</div>
+           <div class="pc-city">Barcelone</div>
+           <div class="pc-dt">14 → 21 juillet 2026</div>
+         </div>
+         <div class="pc-bot">
+           <div class="pc-lnk">Voir la vue partenaire</div>
+           <div style="flex:1;"></div>
+           <div class="pc-sub">→</div>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- ════ S8 — PARTNER VIEW ════ -->
+   <div class="screen" id="s8">
+     <div style="padding-bottom:96px; background:#fff;">
+       <div class="ptnr-hero">
+         <div class="ph-from">Partagé par Marie</div>
+         <div class="ph-city">Barcelone</div>
+         <div class="ph-dt">14 → 21 juillet 2026</div>
+       </div>
+
+       <div class="ptnr-prog">
+         <div class="pp-lbl">Progression</div>
+         <div class="pp-nums">
+           <span class="pp-big" id="pp-big">10</span>
+           <span class="pp-of">&nbsp;/ 22</span>
+         </div>
+         <div class="pp-sub" style="margin-bottom:12px;">éléments validés</div>
+         <div class="pp-bar"><div class="pp-fill" id="pp-bar" style="width:45%"></div></div>
+       </div>
+
+       <!-- Vol -->
+       <div class="ptnr-sec">Vol</div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb on"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt done">Billets confirmés</div>
+       </div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb on"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt done">Check-in en ligne fait</div>
+       </div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb on"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt done">Cartes d'embarquement téléchargées</div>
+       </div>
+
+       <!-- Hôtel -->
+       <div class="ptnr-sec">Hôtel</div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb on"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt done">Réservation confirmée</div>
+       </div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt">Heure d'arrivée communiquée à l'hôtel</div>
+       </div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt">Politique d'annulation vérifiée</div>
+       </div>
+
+       <!-- Location -->
+       <div class="ptnr-sec">Location voiture</div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt">Réservation confirmée</div>
+       </div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt">Siège enfant réservé</div>
+       </div>
+       <div class="ptnr-item" onclick="ptick(this)">
+         <div class="cb"><span class="cb-mk">✓</span></div>
+         <div class="pi-txt">Assurance vérifiée</div>
+       </div>
+
+       <div style="padding:24px 24px 0;text-align:center;">
+         <div style="font-size:11px;color:var(--light);letter-spacing:.5px;">Allset · synchronisé en temps réel avec Marie</div>
+       </div>
+     </div>
+     <div class="ptnr-footer">
+       <div class="pf-back" onclick="back()">← Retour à Allset</div>
+     </div>
+   </div>
+
+  </div><!-- /screens -->
+
+  <div class="toast" id="tst"></div>
+ </div>
+</div>
+
+<div class="meta">
+  <div class="sc-name" id="sc-name">Écran d'accueil</div>
+  <div class="sc-hint" id="sc-hint">Appuyez pour commencer</div>
+</div>
+
+<script>
+  const labels = {
+    s1: ['Écran d\'accueil',          'Appuyez pour entrer dans l\'app'],
+    s2: ['Mes voyages',               'Tapez une carte ou « + » pour créer un voyage'],
+    s3: ['Créer un voyage',           'Remplissez puis appuyez sur « Créer le voyage →»'],
+    s4: ['Dashboard voyage',          'Tapez une étape pour voir sa checklist'],
+    s5: ['Ajouter une étape',         'Choisissez un type — la checklist est générée auto'],
+    s6: ['Checklist — Vol',           'Cochez les items pour marquer l\'avancement'],
+    s7: ['Partager',                  'Copiez le lien ou voyez l\'aperçu partenaire'],
+    s8: ['Vue partenaire (web)',       'Cochez pour synchroniser avec Marie'],
+  };
+  const darkSB = ['s1','s4','s8'];
+
+  let hist = ['s1'];
+
+  function go(id, dir) {
+    const cur = hist[hist.length - 1];
+    if (cur === id) return;
+    document.getElementById(cur).classList.remove('active','bk');
+    const el = document.getElementById(id);
+    el.classList.remove('active','bk');
+    if (dir === 'bwd') el.classList.add('bk');
+    el.classList.add('active');
+    el.scrollTop = 0;
+    hist.push(id);
+    setMeta(id);
+  }
+
+  function back() {
+    if (hist.length < 2) return;
+    hist.pop();
+    const prev = hist[hist.length - 1];
+    const cur  = document.querySelector('.screen.active');
+    cur.classList.remove('active','bk');
+    const el = document.getElementById(prev);
+    el.classList.remove('active','bk');
+    el.classList.add('bk');
+    el.classList.add('active');
+    setMeta(prev);
+  }
+
+  function setMeta(id) {
+    const [name, hint] = labels[id] || [id,''];
+    document.getElementById('sc-name').textContent = name;
+    document.getElementById('sc-hint').textContent = hint;
+    const sb = document.getElementById('sb');
+    sb.className = 'sb ' + (darkSB.includes(id) ? 'light' : 'dark');
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('tst');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function tick(el) {
+    const cb  = el.querySelector('.cb');
+    const txt = el.querySelector('.cl-txt');
+    cb.classList.toggle('on');
+    txt.classList.toggle('done');
+    // Update counter
+    const done = document.querySelectorAll('#s6 .cb.on').length;
+    document.getElementById('cl-done-ct').textContent = done;
+  }
+
+  function ptick(el) {
+    const cb  = el.querySelector('.cb');
+    const txt = el.querySelector('.pi-txt');
+    const wasOn = cb.classList.contains('on');
+    cb.classList.toggle('on');
+    txt.classList.toggle('done');
+    // Update partner progress
+    const done = document.querySelectorAll('#s8 .cb.on').length;
+    const tot  = document.querySelectorAll('#s8 .cb').length;
+    document.getElementById('pp-big').textContent = done;
+    document.getElementById('pp-bar').style.width = Math.round(done/tot*100) + '%';
+    toast(wasOn ? 'Item décoché — synchronisé avec Marie' : 'Item validé — synchronisé avec Marie ✓');
+  }
+
+  function selType(el) {
+    el.closest('.type-grid').querySelectorAll('.type-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+</script>
+</body>
+</html>
