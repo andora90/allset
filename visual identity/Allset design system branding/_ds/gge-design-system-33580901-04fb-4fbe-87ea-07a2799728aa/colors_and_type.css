@@ -1,0 +1,215 @@
+/* ============================================================
+   GGE — Design System / Direction des Opérations
+   colors_and_type.css
+   Foundations: color tokens + typography for institutional decks
+   Fonts: Barlow + Barlow Condensed (Google Fonts)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+
+:root {
+
+  /* ---------- COLOR — brand palette (raw) ---------- */
+  --gge-marine:        #001F60;   /* Bleu marine GGE — dominant 60-70% */
+  --gge-petrole:       #163E64;   /* Bleu pétrole — secondary text */
+  --gge-fuchsia:       #E01289;   /* Fuchsia GGE — single accent, <=5% */
+  --gge-white:         #FFFFFF;   /* Fond principal */
+  --gge-grey-card:     #F2F2F4;   /* Cartouche secondaire / cards */
+  --gge-grey-border:   #E8E8E8;   /* Bordures, séparateurs */
+  --gge-grey-muted:    #BFBFBF;   /* Footers, méta, légendes */
+  --gge-ink:           #0E2841;   /* Texte courant sur blanc */
+
+  /* ---------- COLOR — semantic roles ---------- */
+  --bg-slide:          var(--gge-white);     /* content slide background */
+  --bg-divider:        var(--gge-marine);    /* divider / section background */
+  --bg-card:           var(--gge-grey-card); /* secondary cartouche */
+  --surface-border:    var(--gge-grey-border);
+
+  --fg-title:          var(--gge-marine);    /* slide titles, KPI numbers */
+  --fg-body:           var(--gge-ink);       /* body text on white */
+  --fg-secondary:      var(--gge-petrole);   /* subtitles, secondary text */
+  --fg-muted:          var(--gge-grey-muted);/* footers, meta */
+  --fg-on-dark:        var(--gge-white);     /* text on marine */
+
+  --accent:            var(--gge-fuchsia);   /* the single critical accent */
+  --accent-soft:       rgba(224, 18, 137, 0.08); /* faint fuchsia wash for priority cells */
+
+  /* watermark / decorative tints on marine */
+  --on-dark-3:         rgba(255,255,255,0.03);
+  --on-dark-5:         rgba(255,255,255,0.05);
+  --on-dark-6:         rgba(255,255,255,0.06);
+  --accent-12:         rgba(224,18,137,0.12);
+
+  /* dot / bullet markers */
+  --dot:               var(--gge-marine);
+
+  /* ---------- TYPE — families ---------- */
+  --font-body:    'Barlow', 'Aptos', 'Calibri', 'Helvetica', sans-serif;
+  --font-display: 'Barlow Condensed', 'Barlow', 'Aptos', 'Calibri', sans-serif;
+
+  /* ---------- TYPE — weights ---------- */
+  --w-light:    300;
+  --w-regular:  400;
+  --w-medium:   500;
+  --w-semibold: 600;
+  --w-bold:     700;
+
+  /* ---------- TYPE — role tokens (size / weight / family) ----------
+     Sizes target the 1920×1080 canvas. Scale proportionally if reused. */
+
+  /* Slide title = conclusion. Barlow Condensed 700, marine */
+  --slide-title-size:    30px;
+  --slide-title-weight:  var(--w-bold);
+
+  /* Over-title / étiquette — fuchsia, UPPER, tracked */
+  --eyebrow-size:        11px;
+  --eyebrow-weight:      var(--w-semibold);
+  --eyebrow-tracking:    2px;
+
+  /* Divider section title — white on marine */
+  --divider-title-size:  68px;
+  --divider-title-weight:var(--w-bold);
+
+  /* Divider watermark number */
+  --divider-num-size:    260px;
+
+  /* Cover subtitle */
+  --cover-sub-size:      16px;
+  --cover-sub-weight:    var(--w-light);
+
+  /* Body / bullets */
+  --body-size:           13px;
+  --body-weight:         var(--w-regular);
+  --body-leading:        1.4;
+
+  /* KPI number XXL */
+  --kpi-size:            72px;
+  --kpi-weight:          var(--w-bold);
+  --kpi-label-size:      10px;
+  --kpi-label-tracking:  3px;
+
+  /* Footer / pagination */
+  --footer-size:         9px;
+  --footer-tracking:     1.5px;
+
+  /* ---------- LAYOUT ---------- */
+  --slide-w:        1920px;
+  --slide-h:        1080px;
+  --margin-x:       44px;   /* inner left/right margin */
+  --margin-y:       32px;   /* inner top/bottom margin */
+  --accent-bar-h:   3px;    /* fuchsia underline bar height */
+  --pastille-size:  48px;   /* numbered circle */
+  --col-rule:       1px solid var(--surface-border);
+}
+
+/* ============================================================
+   SEMANTIC TYPE CLASSES — apply directly in slide markup
+   ============================================================ */
+
+.gge-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--eyebrow-size);
+  font-weight: var(--eyebrow-weight);
+  letter-spacing: var(--eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.gge-slide-title {
+  font-family: var(--font-display);
+  font-size: var(--slide-title-size);
+  font-weight: var(--slide-title-weight);
+  line-height: 1.05;
+  color: var(--fg-title);
+  letter-spacing: 0.2px;
+}
+
+/* fuchsia signature underline under content-slide title (R3) */
+.gge-accent-bar {
+  width: 56px;
+  height: var(--accent-bar-h);
+  background: var(--accent);
+  margin-top: 10px;
+}
+
+.gge-divider-title {
+  font-family: var(--font-display);
+  font-size: var(--divider-title-size);
+  font-weight: var(--divider-title-weight);
+  line-height: 1.02;
+  color: var(--fg-on-dark);
+}
+
+.gge-cover-sub {
+  font-family: var(--font-body);
+  font-size: var(--cover-sub-size);
+  font-weight: var(--cover-sub-weight);
+  line-height: 1.5;
+  color: var(--fg-secondary);
+}
+
+.gge-body {
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  font-weight: var(--body-weight);
+  line-height: var(--body-leading);
+  color: var(--fg-secondary);
+}
+
+/* critical bullet — single per column max (R2) */
+.gge-body--critical {
+  color: var(--accent);
+  font-weight: var(--w-semibold);
+}
+
+.gge-kpi-num {
+  font-family: var(--font-display);
+  font-size: var(--kpi-size);
+  font-weight: var(--kpi-weight);
+  line-height: 1;
+  color: var(--fg-title);
+  font-variant-numeric: tabular-nums;
+}
+
+.gge-kpi-label {
+  font-family: var(--font-body);
+  font-size: var(--kpi-label-size);
+  font-weight: var(--w-semibold);
+  letter-spacing: var(--kpi-label-tracking);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.gge-footer {
+  font-family: var(--font-body);
+  font-size: var(--footer-size);
+  font-weight: var(--w-regular);
+  letter-spacing: var(--footer-tracking);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* numbered pastille */
+.gge-pastille {
+  width: var(--pastille-size);
+  height: var(--pastille-size);
+  border-radius: 50%;
+  background: var(--gge-marine);
+  color: var(--fg-on-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: var(--w-bold);
+  font-size: 23px;
+}
+
+/* functional emoji marker — bare glyph, no border, no fill (R9) */
+.gge-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  flex: none;
+}

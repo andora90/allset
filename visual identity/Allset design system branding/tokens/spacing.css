@@ -1,0 +1,32 @@
+/* Allset — Spacing & layout tokens
+   ============================================================ */
+:root {
+  /* ── Base scale ── */
+  --sp-1:   4px;
+  --sp-2:   8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+  --sp-30: 120px;
+
+  /* ── Semantic layout ── */
+  --slide-pad-x:  120px;  /* Padding horizontal d'une slide */
+  --slide-pad-y:   80px;  /* Padding vertical d'une slide */
+  --card-pad-x:    32px;  /* Padding horizontal d'une carte */
+  --card-pad-y:    28px;  /* Padding vertical d'une carte */
+
+  /* ── Borders & radius ── */
+  --radius:      2px;    /* Radius par défaut — toujours 0 ou 2px */
+  --radius-none: 0;
+  --col-rule:    1px solid var(--divider);
+
+  /* ── Accent decoration ── */
+  --accent-line-h: 2px;  /* Hauteur de la ligne Bark de signature */
+}

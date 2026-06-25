@@ -1,0 +1,401 @@
+<!-- ── FONTS ───────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<style>
+  .ad { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#fff; color:#1A1816; }
+
+  /* Header voyage */
+  .ad-hdr { padding:16px 20px 20px; border-bottom:1px solid #DDD6C8; }
+  .ad-back { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600;
+             letter-spacing:.3px; color:#7A756D; text-decoration:none; margin-bottom:14px; }
+  .ad-back:active { opacity:.6; }
+  .ad-hdr-nom  { font-family:'Playfair Display',Georgia,serif; font-style:italic;
+                 font-size:26px; line-height:1.15; color:#1A1816; margin:0 0 6px; }
+  .ad-hdr-meta { font-size:12px; color:#7A756D; display:flex; align-items:center; gap:8px; }
+  .ad-hdr-profil { font-size:9px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase;
+                   color:#7A756D; border:1px solid #DDD6C8; border-radius:4px; padding:3px 7px; }
+
+  /* Progress bar */
+  .ad-prog { padding:20px 20px 16px; border-bottom:1px solid #DDD6C8; }
+  .ad-prog-inner { display:flex; align-items:center; gap:20px; }
+  .ad-prog-left  { flex-shrink:0; }
+  .ad-prog-nums  { display:flex; align-items:baseline; gap:2px; }
+  .ad-prog-big   { font-size:28px; font-weight:700; }
+  .ad-prog-sep, .ad-prog-tot { font-size:18px; color:#7A756D; }
+  .ad-prog-lbl   { font-size:12px; color:#7A756D; margin-top:2px; line-height:1.3; }
+  .ad-bar  { flex:1; height:3px; background:#DDD6C8; border-radius:2px; }
+  .ad-fill { height:100%; background:#1A1816; border-radius:2px; transition:width .6s; }
+
+  /* Section label */
+  .ad-sec-lbl { font-size:10px; letter-spacing:1.5px; color:#7A756D; text-transform:uppercase;
+                padding:12px 20px 8px; border-bottom:1px solid #DDD6C8; }
+
+  /* Step rows */
+  .ad-row { display:flex; align-items:center; gap:12px; padding:14px 20px;
+            border-bottom:1px solid #DDD6C8; cursor:pointer;
+            text-decoration:none; color:inherit; -webkit-tap-highlight-color:transparent; }
+  .ad-row:active { background:#FAFAF7; }
+
+  /* Status icons */
+  .ad-ic  { width:28px; height:28px; border-radius:7px; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center; }
+  .ic-ok   { background:#3A7D44; color:#fff; }
+  .ic-wip  { background:#E8A020; color:#fff; }
+  .ic-ko   { background:#FFEBEE; color:#C62828; }
+  .ic-gray { background:#EFEFEF; color:#9E9E9E; }
+  .ad-ic svg { width:14px; height:14px; flex-shrink:0; }
+
+  /* Step info */
+  .ad-info { flex:1; min-width:0; }
+  .ad-name { font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ad-sub  { font-size:12px; color:#7A756D; margin-top:2px; }
+
+  /* Status label */
+  .ad-st   { font-size:11px; font-weight:600; letter-spacing:.3px; white-space:nowrap; }
+  .st-ok   { color:#1A1816; }
+  .st-wip  { color:#1A1816; }
+  .st-ko   { color:#B8B0A4; }
+  .st-gray { color:#B8B0A4; }
+  .ad-arr  { color:#B8B0A4; font-size:18px; flex-shrink:0; }
+
+  /* Add step row */
+  .ad-add { display:flex; align-items:center; gap:10px; padding:14px 20px;
+            color:#7A756D; font-size:14px; cursor:pointer;
+            border-bottom:1px solid #DDD6C8; -webkit-tap-highlight-color:transparent; }
+  .ad-add:active { background:#FAFAF7; }
+  .ad-add-plus { font-size:22px; font-weight:300; color:#B8B0A4; line-height:1; }
+
+  /* Share CTA */
+  .ad-cta { padding:16px 20px 32px; }
+  .ad-btn { display:block; width:100%; padding:16px; background:#1A1816; color:#fff;
+            border:none; border-radius:12px; font-size:15px; font-weight:600;
+            letter-spacing:.3px; cursor:pointer; text-align:center; }
+  .ad-btn:disabled { opacity:.4; cursor:default; }
+
+  .ad-empty { padding:32px 20px; text-align:center; color:#B8B0A4; font-size:14px; }
+</style>
+
+<div class="ad">
+
+  <div class="ad-hdr" id="ad-hdr" style="display:none">
+    <a href="/mes-voyages" class="ad-back">← Mes voyages</a>
+    <div class="ad-hdr-nom" id="ad-hdr-nom"></div>
+    <div class="ad-hdr-meta">
+      <span id="ad-hdr-dates"></span>
+      <span class="ad-hdr-profil" id="ad-hdr-profil" style="display:none"></span>
+    </div>
+  </div>
+
+  <div class="ad-prog">
+    <div class="ad-prog-inner">
+      <div class="ad-prog-left">
+        <div class="ad-prog-nums">
+          <span class="ad-prog-big" id="ad-done">—</span>
+          <span class="ad-prog-sep">&thinsp;/&thinsp;</span>
+          <span class="ad-prog-tot" id="ad-total">—</span>
+        </div>
+        <div class="ad-prog-lbl">éléments<br>validés</div>
+      </div>
+      <div class="ad-bar"><div class="ad-fill" id="ad-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="ad-sec-lbl">Étapes</div>
+  <div id="ad-steps"><div class="ad-empty">Chargement…</div></div>
+
+  <div class="ad-add" id="ad-add">
+    <span class="ad-add-plus">+</span>
+    <span>Ajouter une étape…</span>
+  </div>
+
+  <div class="ad-cta">
+    <button class="ad-btn" id="ad-btn">Partager →</button>
+  </div>
+</div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG — adapter ces valeurs à votre setup
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+
+    // IDs de tables Airtable (depuis l'URL Airtable — plus fiable que les noms)
+    TABLES: {
+      VOYAGE:    'tblpDZfQ72KQzXhEr',   // 02_VOYAGE
+      ETAPE:     'tblH5zDlgVMerNdhi',   // 03_ETAPE
+      CHECKLIST: 'tblAksOV1ZaBl3c5R',   // 04_CHECKLIST_ITEM
+    },
+
+    // Pages Softr (mettre à jour avec les vrais slugs)
+    PAGES: {
+      DETAIL_ETAPE:  '/detail-etape',
+      AJOUTER_ETAPE: '/ajouter-etape',
+      PARTAGER:      '/partager',
+    },
+
+    // Noms des champs Airtable (confirmés depuis la DB)
+    FIELDS: {
+      VOYAGE: {
+        nomVoyage:     'nom_voyage',
+        dateDepart:    'date_depart',
+        dateRetour:    'date_retour',
+        profilVoyage:  'profil_voyage',
+        shareToken:    'share_token',
+        etapes:        '03_ETAPE',           // multipleRecordLinks → 03_ETAPE
+        checklistItems:'04_CHECKLIST_ITEM',  // multipleRecordLinks → 04_CHECKLIST_ITEM
+      },
+      ETAPE: {
+        label:              'label',
+        typeEtape:          'type_etape',
+        statutConfirmation: 'statut_confirmation',
+        dateEtape:          'date_etape',
+        confirmationRef:    'confirmation_ref',
+        ordre:              'ordre',
+      },
+      CHECKLIST: {
+        isChecked: 'is_checked',
+        etapeId:   'etape_id',
+      },
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     ICÔNES & STATUTS
+  ═══════════════════════════════════════════════════════════════ */
+  const SVG = {
+    check: `<svg viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10.5L11.5 3.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    bolt:  `<svg viewBox="0 0 14 14" fill="currentColor"><path d="M8.5 1L4 7.5H8L5.5 13L12 6.5H8.5L10 1H8.5Z"/></svg>`,
+    cross: `<svg viewBox="0 0 14 14" fill="none"><path d="M3 3L11 11M11 3L3 11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+    dash:  `<svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+  };
+
+  const ST = {
+    'Confirmé':     { cls:'ic-ok',   icon:SVG.check, stCls:'st-ok'   },
+    'À confirmer':  { cls:'ic-wip',  icon:SVG.bolt,  stCls:'st-wip'  },
+    'Annulé':       { cls:'ic-gray', icon:SVG.dash,  stCls:'st-gray' },
+    '_none':        { cls:'ic-ko',   icon:SVG.cross, stCls:'st-ko'   },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  function getVoyageId() {
+    // 1) Variable Softr substituée côté serveur sur les pages détail
+    const tpl = '{record_id}';
+    if (tpl && tpl !== '{record_id}' && tpl.startsWith('rec')) return tpl;
+    // 2) Paramètre URL (routing SPA Softr)
+    const p = new URLSearchParams(window.location.search);
+    const q = p.get('recordId') || p.get('record_id');
+    if (q?.startsWith('rec')) return q;
+    // 3) Segment de chemin URL en fallback
+    return window.location.pathname.split('/').find(s => s.startsWith('rec')) || null;
+  }
+
+  const FR_MONTHS = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+
+  function parseDate(iso) {
+    if (!iso) return null;
+    const d = new Date(iso.substring(0,10) + 'T00:00:00');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function fmtDate(iso) {
+    const d = parseDate(iso);
+    if (!d) return '';
+    return `${d.getDate()} ${FR_MONTHS[d.getMonth()]}`;
+  }
+
+  function dateRange(depIso, retIso) {
+    const dep = parseDate(depIso);
+    const ret = parseDate(retIso);
+    if (!dep) return '';
+    if (!ret) return fmtDate(depIso);
+    if (dep.getMonth() === ret.getMonth() && dep.getFullYear() === ret.getFullYear()) {
+      return `${dep.getDate()} → ${fmtDate(retIso)} ${dep.getFullYear()}`;
+    }
+    return `${fmtDate(depIso)} → ${fmtDate(retIso)} ${ret.getFullYear()}`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE FETCH
+  ═══════════════════════════════════════════════════════════════ */
+  const hdrs = { Authorization: `Bearer ${CFG.PAT}` };
+
+  async function airtableFetch(tableId, params) {
+    const url = `https://api.airtable.com/v0/${CFG.BASE_ID}/${tableId}?${params}`;
+    const res = await fetch(url, { headers: hdrs });
+    if (!res.ok) throw new Error(`Airtable ${res.status} sur ${tableId}`);
+    return res.json();
+  }
+
+  async function fetchVoyage(voyageId) {
+    // Le endpoint single-record ne supporte pas fields[] — on récupère tout le record
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}/${voyageId}`,
+      { headers: hdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status} sur VOYAGE/${voyageId}`);
+    return res.json();
+  }
+
+  async function fetchEtapes(ids) {
+    if (!ids?.length) return [];
+    const F = CFG.FIELDS.ETAPE;
+    const formula = ids.length === 1
+      ? `RECORD_ID()="${ids[0]}"`
+      : `OR(${ids.map(id => `RECORD_ID()="${id}"`).join(',')})`;
+    const params = [
+      `filterByFormula=${encodeURIComponent(formula)}`,
+      `fields[]=${F.label}`,
+      `fields[]=${F.typeEtape}`,
+      `fields[]=${F.statutConfirmation}`,
+      `fields[]=${F.dateEtape}`,
+      `fields[]=${F.confirmationRef}`,
+      `fields[]=${F.ordre}`,
+      `sort[0][field]=${F.ordre}`,
+      `sort[0][direction]=asc`,
+    ].join('&');
+    const data = await airtableFetch(CFG.TABLES.ETAPE, params);
+    return data.records || [];
+  }
+
+  async function fetchChecklistItems(ids) {
+    if (!ids?.length) return [];
+    const F = CFG.FIELDS.CHECKLIST;
+    const formula = ids.length === 1
+      ? `RECORD_ID()="${ids[0]}"`
+      : `OR(${ids.map(id => `RECORD_ID()="${id}"`).join(',')})`;
+    const params = [
+      `filterByFormula=${encodeURIComponent(formula)}`,
+      `fields[]=${F.isChecked}`,
+      `fields[]=${F.etapeId}`,
+    ].join('&');
+    const data = await airtableFetch(CFG.TABLES.CHECKLIST, params);
+    return data.records || [];
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU
+  ═══════════════════════════════════════════════════════════════ */
+  async function render() {
+    const voyageId = getVoyageId();
+    if (!voyageId) {
+      document.getElementById('ad-steps').innerHTML =
+        '<div class="ad-empty">Ouvrez un voyage pour voir ses étapes.</div>';
+      return;
+    }
+
+    try {
+      // Étape 1 : récupérer le voyage → obtenir les IDs liés
+      const voyage    = await fetchVoyage(voyageId);
+      const FV         = CFG.FIELDS.VOYAGE;
+      const etapeIds   = voyage.fields?.[FV.etapes]         || [];
+      const itemIds    = voyage.fields?.[FV.checklistItems] || [];
+      const shareToken = voyage.fields?.[FV.shareToken]     || '';
+
+      // Header
+      const nomVoyage   = voyage.fields?.[FV.nomVoyage]    || 'Voyage';
+      const profil      = voyage.fields?.[FV.profilVoyage] || '';
+      const range       = dateRange(voyage.fields?.[FV.dateDepart], voyage.fields?.[FV.dateRetour]);
+      document.getElementById('ad-hdr-nom').textContent   = nomVoyage;
+      document.getElementById('ad-hdr-dates').textContent = range;
+      const profilEl = document.getElementById('ad-hdr-profil');
+      if (profil) { profilEl.textContent = profil; profilEl.style.display = ''; }
+      document.getElementById('ad-hdr').style.display = '';
+
+      // Étape 2 : récupérer étapes et items en parallèle par RECORD_ID()
+      const [etapes, items] = await Promise.all([
+        fetchEtapes(etapeIds),
+        fetchChecklistItems(itemIds),
+      ]);
+
+      // Barre de progression
+      const FC    = CFG.FIELDS.CHECKLIST;
+      const total = items.length;
+      const done  = items.filter(r => r.fields[FC.isChecked]).length;
+      document.getElementById('ad-done').textContent  = done;
+      document.getElementById('ad-total').textContent = total;
+      document.getElementById('ad-fill').style.width  =
+        total ? Math.round(done / total * 100) + '%' : '0%';
+
+      // Comptage checklist par étape
+      const cnt = {}, dn = {};
+      items.forEach(r => {
+        const eid = (r.fields[FC.etapeId] || [])[0];
+        if (!eid) return;
+        cnt[eid] = (cnt[eid] || 0) + 1;
+        if (r.fields[FC.isChecked]) dn[eid] = (dn[eid] || 0) + 1;
+      });
+
+      // Rendu des étapes
+      const FE      = CFG.FIELDS.ETAPE;
+      const stepsEl = document.getElementById('ad-steps');
+
+      if (!etapes.length) {
+        stepsEl.innerHTML = '<div class="ad-empty">Aucune étape pour ce voyage.</div>';
+      } else {
+        stepsEl.innerHTML = etapes.map(e => {
+          const f    = e.fields;
+          const name = f[FE.label] || f[FE.typeEtape] || '—';
+          const stat = f[FE.statutConfirmation] || '_none';
+          const s    = ST[stat] || ST['_none'];
+          const c    = cnt[e.id] || 0;
+          const d    = dn[e.id]  || 0;
+          const ref  = f[FE.confirmationRef] || fmtDate(f[FE.dateEtape]) || '';
+          let sub;
+          if (c > 0) {
+            const detail = ref || (d === 0 ? 'Non commencé' : '');
+            sub = detail ? `${d} / ${c} · ${detail}` : `${d} / ${c}`;
+          } else {
+            sub = ref;
+          }
+          const href = `${CFG.PAGES.DETAIL_ETAPE}?recordId=${e.id}`;
+          return `<a class="ad-row" href="${href}">
+            <div class="ad-ic ${s.cls}">${s.icon}</div>
+            <div class="ad-info">
+              <div class="ad-name">${name}</div>
+              ${sub ? `<div class="ad-sub">${sub}</div>` : ''}
+            </div>
+            <div class="ad-st ${s.stCls}">${stat !== '_none' ? stat : ''}</div>
+            <div class="ad-arr">›</div>
+          </a>`;
+        }).join('');
+      }
+
+      // Bouton "Ajouter une étape"
+      document.getElementById('ad-add').onclick = () => {
+        window.location.href = `${CFG.PAGES.AJOUTER_ETAPE}?prefill_voyage=${voyageId}`;
+      };
+
+      // Bouton Partager
+      const btn = document.getElementById('ad-btn');
+      btn.onclick = () => {
+        const url = shareToken
+          ? `${CFG.PAGES.PARTAGER}?token=${shareToken}`
+          : `${CFG.PAGES.PARTAGER}?record=${voyageId}`;
+        window.location.href = url;
+      };
+
+    } catch (err) {
+      console.error('[Allset] dashboard:', err);
+      document.getElementById('ad-steps').innerHTML =
+        `<div class="ad-empty">Impossible de charger les étapes.<br>
+        <small style="color:#B8B0A4">${err.message}</small></div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT — compatible SPA Softr
+  ═══════════════════════════════════════════════════════════════ */
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => !!getVoyageId()).then(render).catch(render);
+  } else {
+    setTimeout(render, 800);
+  }
+
+</script>

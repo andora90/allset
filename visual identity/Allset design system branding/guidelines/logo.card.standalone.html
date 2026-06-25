@@ -1,0 +1,65 @@
+<!-- @dsCard group="Brand" viewport="700x140" subtitle="Wordmark A — Cormorant Garamond italic, clair et sombre" name="Logo Wordmark" -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; display: flex; height: 140px; }
+    .panel { flex: 1; display: flex; align-items: center; padding: 0 36px; gap: 20px; }
+    .wm { display: inline-flex; flex-direction: column; align-items: flex-start; }
+    .wm span { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 52px; line-height: 1; letter-spacing: -1px; }
+    .wm-line { width: 100%; height: 2px; background: var(--allset-bark); margin-top: 5px; }
+    .label { font-family: var(--font-body); font-size: 10px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; opacity: 0.4; margin-top: 12px; }
+  </style>
+  <template id="__bundler_thumbnail" data-bg-color="#1C1714">
+    <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg">
+      <!-- Cream panel -->
+      <rect x="0" y="0" width="233" height="140" fill="#F5F0E8"/>
+      <!-- Dark panel -->
+      <rect x="233" y="0" width="234" height="140" fill="#1C1714"/>
+      <!-- Bark panel -->
+      <rect x="467" y="0" width="233" height="140" fill="#8D5B4C"/>
+      <!-- Logo wordmark silhouette - dark on cream -->
+      <rect x="36" y="50" width="120" height="8" rx="2" fill="#1C1714" opacity="0.7"/>
+      <rect x="36" y="64" width="120" height="2" fill="#8D5B4C"/>
+      <!-- Logo wordmark silhouette - cream on dark -->
+      <rect x="269" y="50" width="120" height="8" rx="2" fill="#F5F0E8" opacity="0.7"/>
+      <rect x="269" y="64" width="120" height="2" fill="#8D5B4C"/>
+      <!-- Logo wordmark silhouette - cream on bark -->
+      <rect x="503" y="50" width="120" height="8" rx="2" fill="#F5F0E8" opacity="0.7"/>
+      <rect x="503" y="64" width="120" height="1.5" fill="rgba(245,240,232,0.5)"/>
+    </svg>
+  </template>
+</head>
+<body>
+  <div class="panel" style="background:var(--allset-cream);">
+    <div>
+      <div class="wm">
+        <span style="color:var(--allset-obsidian);">allset</span>
+        <div class="wm-line"></div>
+      </div>
+      <div class="label" style="color:var(--allset-obsidian);">Sur fond clair</div>
+    </div>
+  </div>
+  <div class="panel" style="background:var(--allset-obsidian);">
+    <div>
+      <div class="wm">
+        <span style="color:var(--allset-cream);">allset</span>
+        <div class="wm-line"></div>
+      </div>
+      <div class="label" style="color:var(--allset-cream);">Sur fond sombre</div>
+    </div>
+  </div>
+  <div class="panel" style="background:var(--allset-bark);">
+    <div>
+      <div class="wm">
+        <span style="color:var(--allset-cream);">allset</span>
+        <div class="wm-line" style="background:rgba(245,240,232,0.5);"></div>
+      </div>
+      <div class="label" style="color:var(--allset-cream);">Sur fond accent</div>
+    </div>
+  </div>
+</body>
+</html>

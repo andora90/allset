@@ -1,0 +1,490 @@
+<!--
+  ALLSET — "Vue partenaire" Custom Code Block pour Softr
+  ────────────────────────────────────────────────────────
+  Coller dans : Page Settings → Custom Code → Body
+  URL attendue : /vue-partenaire?token=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+  Page publique — aucun login requis.
+  Fonctionnalités :
+  - Lecture du ?token= dans l'URL
+  - Fetch du voyage correspondant dans Airtable (sans auth utilisateur)
+  - Affichage des étapes + checklists regroupées
+  - Toggle checklist (checked_by = 'partenaire')
+-->
+
+<!-- ── FONTS ───────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ─────────────────────────────────────────────────────── -->
+<style>
+  .vp { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;
+        background:#F3EFE6; color:#1A1816; min-height:100vh;
+        -webkit-font-smoothing:antialiased; }
+
+  /* ── Header voyage ── */
+  .vp-hdr { padding:24px 20px 20px; background:#F3EFE6; border-bottom:1px solid #DDD6C8; }
+  .vp-badge { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+              color:#7A756D; margin-bottom:8px; }
+  .vp-nom  { font-family:'Playfair Display',Georgia,serif; font-style:italic;
+             font-size:26px; line-height:1.2; color:#1A1816; margin:0 0 10px; }
+  .vp-dates { font-size:13px; color:#7A756D; margin-bottom:14px; }
+
+  /* ── Progress global ── */
+  .vp-prog { display:flex; align-items:center; gap:12px; }
+  .vp-prog-bar  { flex:1; height:3px; background:#DDD6C8; border-radius:2px; }
+  .vp-prog-fill { height:100%; background:#1A1816; border-radius:2px; transition:width .4s; }
+  .vp-prog-txt  { font-size:12px; color:#7A756D; white-space:nowrap; }
+  .vp-prog-txt strong { color:#1A1816; }
+
+  /* ── Corps ── */
+  .vp-body { padding-bottom:48px; }
+
+  /* ── Section étape ── */
+  .vp-etape { background:#fff; margin:16px 16px 0; border-radius:12px;
+              border:1px solid #DDD6C8; overflow:hidden; }
+  .vp-etape-hdr { padding:14px 16px; border-bottom:1px solid #DDD6C8; }
+  .vp-etape-type { font-size:10px; font-weight:700; letter-spacing:1.5px;
+                   text-transform:uppercase; color:#7A756D; margin-bottom:4px; }
+  .vp-etape-nom { font-family:'Playfair Display',Georgia,serif; font-style:italic;
+                  font-size:18px; line-height:1.2; color:#1A1816; }
+  .vp-etape-date { font-size:12px; color:#B8B0A4; margin-top:4px; }
+
+  /* ── Checklist items ── */
+  .vp-item { display:flex; align-items:center; gap:14px; padding:14px 16px;
+             border-bottom:1px solid #F3EFE6; cursor:pointer;
+             -webkit-tap-highlight-color:transparent; transition:background .1s; }
+  .vp-item:last-child { border-bottom:none; }
+  .vp-item:active { background:#FAFAF7; }
+  .vp-item.is-checked .vp-item-lbl { color:#B8B0A4; text-decoration:line-through;
+                                      text-decoration-color:#DDD6C8; }
+  .vp-cb { width:22px; height:22px; border-radius:6px; flex-shrink:0;
+           border:2px solid #DDD6C8; display:flex; align-items:center; justify-content:center;
+           transition:all .15s; }
+  .vp-cb.checked { background:#1A1816; border-color:#1A1816; }
+  .vp-cb svg { width:12px; height:12px; opacity:0; transition:opacity .15s; }
+  .vp-cb.checked svg { opacity:1; }
+  .vp-item-lbl { font-size:15px; flex:1; line-height:1.3; transition:color .2s; }
+
+  .vp-etape-empty { padding:14px 16px; font-size:13px; color:#B8B0A4; font-style:italic; }
+
+  /* ── Indicateur partenaire ── */
+  .vp-by { font-size:10px; color:#B8B0A4; letter-spacing:.3px; margin-left:auto; flex-shrink:0; }
+
+  /* ── Footer ── */
+  .vp-footer { padding:32px 20px 16px; text-align:center; }
+  .vp-footer-txt { font-size:12px; color:#B8B0A4; line-height:1.7; }
+  .vp-footer-logo { font-size:14px; font-weight:700; letter-spacing:1px; color:#DDD6C8;
+                    margin-top:8px; }
+
+  /* ── États ── */
+  .vp-loading { padding:48px 20px; text-align:center; color:#B8B0A4; font-size:14px;
+               line-height:1.7; }
+  .vp-error   { padding:48px 20px; text-align:center; color:#B8B0A4; font-size:14px;
+               line-height:1.7; }
+  .vp-error small { display:block; color:#DDD6C8; font-size:11px; margin-top:8px; }
+
+  /* ── Toast ── */
+  .vp-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+              background:#1A1816; color:#fff; padding:10px 20px; border-radius:30px;
+              font-size:13px; font-weight:500; opacity:0; transition:all .3s;
+              pointer-events:none; white-space:nowrap; z-index:999; }
+  .vp-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+
+<!-- ── MARKUP ──────────────────────────────────────────────────────── -->
+<div class="vp" id="vp-root">
+  <div class="vp-loading" id="vp-loading">Chargement du voyage…</div>
+</div>
+
+<div class="vp-toast" id="vp-toast"></div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+
+    TABLES: {
+      VOYAGE:    'tblpDZfQ72KQzXhEr',
+      ETAPE:     'tblH5zDlgVMerNdhi',
+      CHECKLIST: 'tblAksOV1ZaBl3c5R',
+    },
+
+    F: {
+      VOYAGE: {
+        nomVoyage:   'nom_voyage',
+        dateDepart:  'date_depart',
+        dateRetour:  'date_retour',
+        shareToken:  'share_token',
+        partenaires: 'partenaires',
+        etapes:      '03_ETAPE',
+      },
+      ETAPE: {
+        label:     'label',
+        typeEtape: 'type_etape',
+        dateEtape: 'date_etape',
+        dateFin:   'date_fin',
+        ordre:     'ordre',
+        items:     '04_CHECKLIST_ITEM',
+      },
+      CHECKLIST: {
+        label:     'label',
+        isChecked: 'is_checked',
+        checkedBy: 'checked_by',
+      },
+    },
+  };
+
+  const CHECK_SVG = `<svg viewBox="0 0 12 12" fill="none">
+    <path d="M2 6L5 9.5L10 2.5" stroke="white" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  const FR_MONTHS = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso.substring(0,10) + 'T00:00:00');
+    return isNaN(d.getTime()) ? '' : `${d.getDate()} ${FR_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  function dateRange(depIso, retIso) {
+    const dep = depIso ? new Date(depIso.substring(0,10) + 'T00:00:00') : null;
+    const ret = retIso ? new Date(retIso.substring(0,10) + 'T00:00:00') : null;
+    if (!dep) return '';
+    if (!ret) return fmtDate(depIso);
+    if (dep.getMonth() === ret.getMonth() && dep.getFullYear() === ret.getFullYear()) {
+      return `${dep.getDate()} → ${fmtDate(retIso)} ${dep.getFullYear()}`;
+    }
+    return `${fmtDate(depIso)} → ${fmtDate(retIso)} ${ret.getFullYear()}`;
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('vp-toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE
+  ═══════════════════════════════════════════════════════════════ */
+  const hdrs = {
+    Authorization:  `Bearer ${CFG.PAT}`,
+    'Content-Type': 'application/json',
+  };
+
+  async function fetchVoyageByToken(token) {
+    const formula = encodeURIComponent(`{share_token}="${token}"`);
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}?filterByFormula=${formula}&maxRecords=1`,
+      { headers: hdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    const data = await res.json();
+    return data.records?.[0] || null;
+  }
+
+  async function fetchEtapesByIds(ids) {
+    if (!ids?.length) return [];
+    const formula = ids.length === 1
+      ? `RECORD_ID()="${ids[0]}"`
+      : `OR(${ids.map(id => `RECORD_ID()="${id}"`).join(',')})`;
+    const FE = CFG.F.ETAPE;
+    const params = [
+      `filterByFormula=${encodeURIComponent(formula)}`,
+      `fields[]=${FE.label}`,
+      `fields[]=${FE.typeEtape}`,
+      `fields[]=${FE.dateEtape}`,
+      `fields[]=${FE.dateFin}`,
+      `fields[]=${FE.ordre}`,
+      `fields[]=${FE.items}`,
+    ].join('&');
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.ETAPE}?${params}`,
+      { headers: hdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    const data = await res.json();
+    return data.records || [];
+  }
+
+  async function fetchChecklistItemsByIds(ids) {
+    if (!ids?.length) return [];
+    const formula = ids.length === 1
+      ? `RECORD_ID()="${ids[0]}"`
+      : `OR(${ids.map(id => `RECORD_ID()="${id}"`).join(',')})`;
+    const FC = CFG.F.CHECKLIST;
+    const params = [
+      `filterByFormula=${encodeURIComponent(formula)}`,
+      `fields[]=${FC.label}`,
+      `fields[]=${FC.isChecked}`,
+      `fields[]=${FC.checkedBy}`,
+    ].join('&');
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.CHECKLIST}?${params}`,
+      { headers: hdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    const data = await res.json();
+    return data.records || [];
+  }
+
+  async function patchChecklistItem(itemId, isChecked) {
+    const FC = CFG.F.CHECKLIST;
+    await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.CHECKLIST}/${itemId}`,
+      {
+        method:  'PATCH',
+        headers: hdrs,
+        body:    JSON.stringify({
+          fields: {
+            [FC.isChecked]: isChecked,
+            [FC.checkedBy]: isChecked ? 'partenaire' : '',
+          },
+        }),
+      }
+    );
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU
+  ═══════════════════════════════════════════════════════════════ */
+
+  // Tableau plat de tous les items pour la barre de progression globale
+  let allItems = [];
+
+  function updateGlobalProgress() {
+    const done  = allItems.filter(i => i.checked).length;
+    const total = allItems.length;
+    const pct   = total ? Math.round(done / total * 100) : 0;
+    const fill  = document.getElementById('vp-prog-fill');
+    const txt   = document.getElementById('vp-prog-txt');
+    if (fill) fill.style.width = pct + '%';
+    if (txt)  txt.innerHTML    = `<strong>${done}</strong> / ${total} item${total > 1 ? 's' : ''} prêts`;
+  }
+
+  function renderEtape(etape, items) {
+    const FE = CFG.F.ETAPE;
+    const f  = etape.fields || {};
+
+    const typeLabel = f[FE.typeEtape] || '';
+    const nom       = f[FE.label]     || typeLabel || '—';
+    const dateStr   = fmtDate(f[FE.dateEtape]);
+    const dateFin   = fmtDate(f[FE.dateFin]);
+    const dateDisp  = dateFin ? `${dateStr} → ${dateFin}` : dateStr;
+
+    const itemsHtml = items.length
+      ? items.map(item => `
+          <div class="vp-item ${item.checked ? 'is-checked' : ''}" data-item-id="${item.id}">
+            <div class="vp-cb ${item.checked ? 'checked' : ''}">${CHECK_SVG}</div>
+            <div class="vp-item-lbl">${item.label}</div>
+            ${item.checkedBy === 'partenaire' ? '<span class="vp-by">vous</span>' : ''}
+          </div>`).join('')
+      : `<div class="vp-etape-empty">Aucun item pour cette étape.</div>`;
+
+    return `
+      <div class="vp-etape" id="etape-${etape.id}">
+        <div class="vp-etape-hdr">
+          ${typeLabel ? `<div class="vp-etape-type">${typeLabel}</div>` : ''}
+          <div class="vp-etape-nom">${nom}</div>
+          ${dateDisp ? `<div class="vp-etape-date">${dateDisp}</div>` : ''}
+        </div>
+        <div class="vp-items" id="items-${etape.id}">
+          ${itemsHtml}
+        </div>
+      </div>`;
+  }
+
+  function attachToggleListeners(etapeId, items) {
+    const container = document.getElementById(`items-${etapeId}`);
+    if (!container) return;
+
+    container.querySelectorAll('.vp-item[data-item-id]').forEach(el => {
+      el.addEventListener('click', async () => {
+        const itemId  = el.dataset.itemId;
+        const item    = items.find(i => i.id === itemId);
+        if (!item) return;
+
+        const newVal  = !item.checked;
+        item.checked  = newVal;
+        item.checkedBy = newVal ? 'partenaire' : '';
+
+        // Mise à jour optimiste
+        el.classList.toggle('is-checked', newVal);
+        const cb = el.querySelector('.vp-cb');
+        cb.classList.toggle('checked', newVal);
+        const byEl = el.querySelector('.vp-by');
+        if (newVal && !byEl) {
+          const span = document.createElement('span');
+          span.className = 'vp-by';
+          span.textContent = 'vous';
+          el.appendChild(span);
+        } else if (!newVal && byEl) {
+          byEl.remove();
+        }
+        updateGlobalProgress();
+
+        try {
+          await patchChecklistItem(itemId, newVal);
+        } catch (err) {
+          // Rollback
+          item.checked  = !newVal;
+          item.checkedBy = !newVal ? 'partenaire' : '';
+          el.classList.toggle('is-checked', !newVal);
+          cb.classList.toggle('checked', !newVal);
+          const byElAfter = el.querySelector('.vp-by');
+          if (!newVal && !byElAfter) {
+            const span = document.createElement('span');
+            span.className = 'vp-by';
+            span.textContent = 'vous';
+            el.appendChild(span);
+          } else if (newVal && byElAfter) {
+            byElAfter.remove();
+          }
+          updateGlobalProgress();
+          showToast('Erreur de synchronisation — réessayez');
+          console.error('[Allset] vue-partenaire patch:', err);
+        }
+      });
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const root  = document.getElementById('vp-root');
+    const token = new URLSearchParams(window.location.search).get('token');
+
+    if (!token) {
+      root.innerHTML = `<div class="vp-error">
+        Lien invalide.<br>
+        <small>Demandez à l'organisateur du voyage de vous renvoyer le lien.</small>
+      </div>`;
+      return;
+    }
+
+    try {
+      // ── 1. Voyage par token ──────────────────────────────────────────
+      const voyage = await fetchVoyageByToken(token);
+      if (!voyage) {
+        root.innerHTML = `<div class="vp-error">
+          Voyage introuvable.<br>
+          <small>Ce lien est peut-être expiré ou incorrect.</small>
+        </div>`;
+        return;
+      }
+
+      const FV       = CFG.F.VOYAGE;
+      const vf       = voyage.fields || {};
+      const nomVoyage  = vf[FV.nomVoyage]   || 'Voyage';
+      const dates      = dateRange(vf[FV.dateDepart], vf[FV.dateRetour]);
+      const partenaire = vf[FV.partenaires] || '';
+      const etapeIds   = vf[FV.etapes]      || [];
+
+      // ── 2. Étapes ───────────────────────────────────────────────────
+      const etapeRecords = await fetchEtapesByIds(etapeIds);
+      // Trier par ordre
+      etapeRecords.sort((a, b) =>
+        (a.fields?.[CFG.F.ETAPE.ordre] ?? 999) - (b.fields?.[CFG.F.ETAPE.ordre] ?? 999)
+      );
+
+      // ── 3. Checklist items (un seul fetch pour toutes les étapes) ────
+      const FE = CFG.F.ETAPE;
+      const allItemIds = etapeRecords.flatMap(e => e.fields?.[FE.items] || []);
+      const itemRecords = await fetchChecklistItemsByIds(allItemIds);
+
+      // Indexer par record ID
+      const itemMap = {};
+      itemRecords.forEach(r => {
+        const FC = CFG.F.CHECKLIST;
+        itemMap[r.id] = {
+          id:        r.id,
+          label:     r.fields[FC.label]     || '—',
+          checked:   !!r.fields[FC.isChecked],
+          checkedBy: r.fields[FC.checkedBy] || '',
+        };
+      });
+
+      // Grouper par étape et construire allItems (pour la progression globale)
+      allItems = [];
+      const etapeItems = {}; // etapeId → items[]
+      etapeRecords.forEach(e => {
+        const ids   = e.fields?.[FE.items] || [];
+        const items = ids.map(id => itemMap[id]).filter(Boolean);
+        etapeItems[e.id] = items;
+        allItems.push(...items);
+      });
+
+      // ── 4. Rendu HTML ────────────────────────────────────────────────
+      const progressHtml = allItems.length ? `
+        <div class="vp-prog">
+          <div class="vp-prog-bar">
+            <div class="vp-prog-fill" id="vp-prog-fill" style="width:0%"></div>
+          </div>
+          <div class="vp-prog-txt" id="vp-prog-txt">0 / ${allItems.length} items prêts</div>
+        </div>` : '';
+
+      const subtitle = partenaire
+        ? `Vue partagée avec ${partenaire}`
+        : 'Vue partenaire';
+
+      const etapesHtml = etapeRecords.length
+        ? etapeRecords.map(e => renderEtape(e, etapeItems[e.id] || [])).join('')
+        : `<div style="padding:32px 20px;text-align:center;color:#B8B0A4;font-size:14px">
+             Aucune étape dans ce voyage.
+           </div>`;
+
+      root.innerHTML = `
+        <div class="vp-hdr">
+          <div class="vp-badge">${subtitle}</div>
+          <div class="vp-nom">${nomVoyage}</div>
+          ${dates ? `<div class="vp-dates">${dates}</div>` : ''}
+          ${progressHtml}
+        </div>
+        <div class="vp-body">
+          ${etapesHtml}
+          <div class="vp-footer">
+            <div class="vp-footer-txt">Cochez les items au fur et à mesure<br>que vous confirmez vos préparatifs.</div>
+            <div class="vp-footer-logo">ALLSET</div>
+          </div>
+        </div>`;
+
+      // ── 5. Listeners toggle ──────────────────────────────────────────
+      etapeRecords.forEach(e => {
+        attachToggleListeners(e.id, etapeItems[e.id] || []);
+      });
+
+      // Progression initiale
+      updateGlobalProgress();
+
+    } catch (err) {
+      console.error('[Allset] vue-partenaire:', err);
+      root.innerHTML = `<div class="vp-error">
+        Impossible de charger le voyage.<br>
+        <small>${err.message}</small>
+      </div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT — compatible SPA Softr
+  ═══════════════════════════════════════════════════════════════ */
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => true).then(init);
+  } else {
+    setTimeout(init, 400);
+  }
+
+</script>

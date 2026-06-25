@@ -1,0 +1,6 @@
+/* Allset Design System — global entry point
+   Import this one file to get all tokens and type classes.
+   ============================================================ */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';

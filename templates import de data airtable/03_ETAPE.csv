@@ -1,0 +1,3 @@
+etape_id,voyage_id,type_etape,label,date_etape,ordre_FORMULE_AIRTABLE,confirmation_ref,statut_confirmation
+1,1,Vol,Vol Paris–Barcelone,2026-07-10,"=COUNTIF(voyage_id,'=1')",AF1234,À confirmer
+2,1,Hôtel,Hôtel Arts Barcelona,2026-07-10,"=COUNTIF(voyage_id,'=1')",HTL-98765,À confirmer

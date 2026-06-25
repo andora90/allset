@@ -1,0 +1,53 @@
+<!-- @dsCard group="Colors" viewport="700x160" subtitle="Dark Bark · Pebble · Stone · White" name="Neutres" -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--allset-cream); padding: 20px 24px; -webkit-font-smoothing: antialiased; }
+    .row { display: flex; gap: 12px; }
+    .sw { flex: 1; }
+    .sw-block { height: 56px; }
+    .sw-name { font-size: 12px; font-weight: 500; color: var(--allset-obsidian); margin-top: 8px; }
+    .sw-hex { font-size: 11px; color: var(--allset-pebble); font-feature-settings: 'tnum'; }
+    .sw-role { font-size: 10px; color: var(--allset-stone); margin-top: 2px; }
+    .bordered { border: 1px solid var(--allset-stone); }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw">
+      <div class="sw-block" style="background:var(--allset-dark-bark);"></div>
+      <div class="sw-name">Dark Bark</div>
+      <div class="sw-hex">#5C4742</div>
+      <div class="sw-role">Corps de texte sur cream</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block" style="background:var(--allset-pebble);"></div>
+      <div class="sw-name">Pebble</div>
+      <div class="sw-hex">#A5978B</div>
+      <div class="sw-role">Texte secondaire</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block" style="background:var(--allset-stone);"></div>
+      <div class="sw-name">Stone</div>
+      <div class="sw-hex">#C4BBAF</div>
+      <div class="sw-role">Texte tertiaire · dividers</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block bordered" style="background:var(--allset-white);"></div>
+      <div class="sw-name">White</div>
+      <div class="sw-hex">#FFFFFF</div>
+      <div class="sw-role">Cartes sur fond cream</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block" style="background:#111111;"></div>
+      <div class="sw-name">Near-black</div>
+      <div class="sw-hex">#111111</div>
+      <div class="sw-role">UI mobile · device mockups</div>
+    </div>
+  </div>
+</body>
+</html>

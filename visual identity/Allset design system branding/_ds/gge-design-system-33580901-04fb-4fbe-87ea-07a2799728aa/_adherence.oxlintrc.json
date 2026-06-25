@@ -1,0 +1,177 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "slides/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Barlow|Barlow Condensed))/i]",
+        "message": "Font not provided by the design system. Available: Barlow, Barlow Condensed."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {},
+    "tokens": [
+      "--accent",
+      "--accent-12",
+      "--accent-bar-h",
+      "--accent-soft",
+      "--bg-card",
+      "--bg-divider",
+      "--bg-slide",
+      "--body-leading",
+      "--body-size",
+      "--body-weight",
+      "--col-rule",
+      "--cover-sub-size",
+      "--cover-sub-weight",
+      "--divider-num-size",
+      "--divider-title-size",
+      "--divider-title-weight",
+      "--dot",
+      "--eyebrow-size",
+      "--eyebrow-tracking",
+      "--eyebrow-weight",
+      "--fg-body",
+      "--fg-muted",
+      "--fg-on-dark",
+      "--fg-secondary",
+      "--fg-title",
+      "--font-body",
+      "--font-display",
+      "--footer-size",
+      "--footer-tracking",
+      "--gge-fuchsia",
+      "--gge-grey-border",
+      "--gge-grey-card",
+      "--gge-grey-muted",
+      "--gge-ink",
+      "--gge-marine",
+      "--gge-petrole",
+      "--gge-white",
+      "--kpi-label-size",
+      "--kpi-label-tracking",
+      "--kpi-size",
+      "--kpi-weight",
+      "--margin-x",
+      "--margin-y",
+      "--on-dark-3",
+      "--on-dark-5",
+      "--on-dark-6",
+      "--pastille-size",
+      "--slide-h",
+      "--slide-title-size",
+      "--slide-title-weight",
+      "--slide-w",
+      "--surface-border",
+      "--w-bold",
+      "--w-light",
+      "--w-medium",
+      "--w-regular",
+      "--w-semibold"
+    ],
+    "tokenKinds": {
+      "--gge-marine": "color",
+      "--gge-petrole": "color",
+      "--gge-fuchsia": "color",
+      "--gge-white": "color",
+      "--gge-grey-card": "color",
+      "--gge-grey-border": "color",
+      "--gge-grey-muted": "color",
+      "--gge-ink": "color",
+      "--bg-slide": "color",
+      "--bg-divider": "color",
+      "--bg-card": "color",
+      "--surface-border": "color",
+      "--fg-title": "color",
+      "--fg-body": "color",
+      "--fg-secondary": "color",
+      "--fg-muted": "color",
+      "--fg-on-dark": "color",
+      "--accent": "color",
+      "--accent-soft": "color",
+      "--on-dark-3": "color",
+      "--on-dark-5": "color",
+      "--on-dark-6": "color",
+      "--accent-12": "color",
+      "--dot": "color",
+      "--font-body": "font",
+      "--font-display": "font",
+      "--w-light": "other",
+      "--w-regular": "other",
+      "--w-medium": "other",
+      "--w-semibold": "other",
+      "--w-bold": "other",
+      "--slide-title-size": "spacing",
+      "--slide-title-weight": "font",
+      "--eyebrow-size": "spacing",
+      "--eyebrow-weight": "font",
+      "--eyebrow-tracking": "font",
+      "--divider-title-size": "spacing",
+      "--divider-title-weight": "font",
+      "--divider-num-size": "spacing",
+      "--cover-sub-size": "spacing",
+      "--cover-sub-weight": "font",
+      "--body-size": "spacing",
+      "--body-weight": "font",
+      "--body-leading": "font",
+      "--kpi-size": "spacing",
+      "--kpi-weight": "font",
+      "--kpi-label-size": "spacing",
+      "--kpi-label-tracking": "font",
+      "--footer-size": "spacing",
+      "--footer-tracking": "font",
+      "--slide-w": "spacing",
+      "--slide-h": "spacing",
+      "--margin-x": "spacing",
+      "--margin-y": "spacing",
+      "--accent-bar-h": "spacing",
+      "--pastille-size": "spacing",
+      "--col-rule": "color"
+    },
+    "fontFamilies": [
+      "Barlow",
+      "Barlow Condensed"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+template_id,type_etape,label,ordre,is_active
+1,Vol,Passeport valide (+6 mois),1,True
+2,Vol,Billet d'avion téléchargé,2,True
+3,Vol,Check-in en ligne effectué,3,True
+4,Vol,Bagage cabine / soute — poids vérifié,4,True
+5,Vol,Assurance voyage souscrite,5,True
+6,Vol,Transfert aéroport réservé,6,True
+7,Vol,Carte d'embarquement imprimée / mobile,7,True
+8,Vol,Liquides cabin bag — règle 100ml,8,True
+9,Hôtel,Confirmation de réservation reçue,1,True
+10,Hôtel,Heure d'arrivée communiquée à l'hôtel,2,True
+11,Hôtel,Mode de paiement à l'arrivée vérifié,3,True
+12,Hôtel,Adresse et accès enregistrés,4,True
+13,Hôtel,Politique d'annulation notée,5,True
+14,Location voiture,Confirmation de réservation reçue,1,True
+15,Location voiture,Permis de conduire valide,2,True
+16,Location voiture,Carte de crédit du titulaire prévue,3,True
+17,Location voiture,Assurance — options vérifiées,4,True
+18,Location voiture,Lieu et heure de prise en charge notés,5,True
+19,Logement,Confirmation de réservation reçue,1,True
+20,Logement,Code d'accès / clé — procédure notée,2,True
+21,Logement,Contact hôte enregistré,3,True
+22,Logement,Règlement intérieur lu,4,True
+23,Logement,Heure d'arrivée communiquée,5,True
+24,Transfert,Réservation confirmée,1,True
+25,Transfert,Numéro de vol / horaire communiqué au prestataire,2,True
+26,Transfert,Lieu de prise en charge précis noté,3,True
+27,Transfert,Numéro de contact chauffeur enregistré,4,True

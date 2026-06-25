@@ -1,0 +1,488 @@
+<!-- ── FONTS ───────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<style>
+  .pt { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#fff; color:#1A1816; }
+
+  .pt-hdr  { padding:16px 20px 20px; border-bottom:1px solid #DDD6C8; }
+  .pt-back { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600;
+             letter-spacing:.3px; color:#7A756D; text-decoration:none; margin-bottom:14px; }
+  .pt-back:active { opacity:.6; }
+  .pt-sec-lbl { font-size:10px; letter-spacing:1.5px; color:#7A756D; text-transform:uppercase; }
+  .pt-nom  { font-family:'Playfair Display',Georgia,serif; font-style:italic;
+             font-size:22px; line-height:1.2; margin-top:6px; }
+
+  /* Formulaire partenaire */
+  .pt-form-body { padding:24px 20px; }
+  .pt-form-sub  { font-size:14px; color:#7A756D; margin-bottom:20px; }
+  .pt-input { width:100%; padding:14px 16px; border:1px solid #DDD6C8; border-radius:10px;
+              font-size:15px; color:#1A1816; background:#FAFAF7; box-sizing:border-box;
+              font-family:inherit; outline:none; margin-bottom:12px; -webkit-appearance:none; }
+  .pt-input:focus { border-color:#1A1816; background:#fff; }
+
+  /* Partage */
+  .pt-block { padding:16px 20px; border-bottom:1px solid #DDD6C8; }
+  .pt-link-box { background:#F3EFE6; border-radius:10px; padding:14px 16px; margin:10px 0; }
+  .pt-link-url { font-size:12px; color:#7A756D; font-family:monospace; word-break:break-all; line-height:1.5; }
+  .pt-textarea { width:100%; min-height:110px; padding:14px 16px; border:1px solid #DDD6C8; border-radius:10px;
+                 font-size:14px; color:#1A1816; background:#FAFAF7; box-sizing:border-box;
+                 font-family:inherit; line-height:1.5; outline:none; resize:vertical; margin-top:10px; }
+  .pt-textarea:focus { border-color:#1A1816; background:#fff; }
+  .pt-gen-note { font-size:11px; color:#B8B0A4; margin-left:8px; }
+
+  /* Lignes envoi */
+  .pt-send-row  { display:flex; align-items:center; gap:14px; padding:14px 20px;
+                  border-bottom:1px solid #DDD6C8; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .pt-send-row:active { background:#FAFAF7; }
+  .pt-send-icon { width:36px; height:36px; border-radius:10px; background:#F3EFE6; flex-shrink:0;
+                  display:flex; align-items:center; justify-content:center; }
+  .pt-send-icon svg { width:16px; height:16px; }
+  .pt-send-icon-txt { font-size:9px; font-weight:700; letter-spacing:.5px; color:#7A756D; }
+  .pt-send-info { flex:1; }
+  .pt-send-name { font-size:15px; font-weight:600; }
+  .pt-send-sub  { font-size:12px; color:#7A756D; margin-top:1px; }
+  .pt-arr { color:#B8B0A4; font-size:18px; flex-shrink:0; }
+
+  /* Boutons */
+  .pt-btn { display:block; width:100%; padding:16px; background:#1A1816; color:#fff; border:none;
+            border-radius:12px; font-size:15px; font-weight:600; letter-spacing:.3px;
+            cursor:pointer; text-align:center; box-sizing:border-box; }
+  .pt-btn-outline { background:#fff; color:#1A1816; border:1.5px solid #1A1816; }
+  .pt-btn:active { opacity:.8; }
+  .pt-btn:disabled { opacity:.4; cursor:default; }
+
+  /* Écrans */
+  .pt-screen { display:none; }
+  .pt-screen.active { display:block; }
+  .pt-empty { padding:32px 20px; text-align:center; color:#B8B0A4; font-size:14px; }
+
+  /* Toast */
+  .pt-toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
+              background:#1A1816; color:#fff; padding:10px 20px; border-radius:30px;
+              font-size:13px; font-weight:500; opacity:0; transition:all .3s;
+              pointer-events:none; white-space:nowrap; z-index:999; }
+  .pt-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+
+<div class="pt">
+
+  <div id="pt-loading" class="pt-empty">Chargement…</div>
+
+  <!-- ÉCRAN 1 — Renseignement partenaire -->
+  <div class="pt-screen" id="pt-screen-form">
+    <div class="pt-hdr">
+      <a class="pt-back" id="pt-back-1" href="/mes-voyages">← Retour</a>
+      <div class="pt-sec-lbl">Partager</div>
+      <div class="pt-nom" id="pt-nom-1"></div>
+    </div>
+    <div class="pt-form-body">
+      <div class="pt-form-sub">Avec qui partagez-vous ce voyage ?</div>
+      <input class="pt-input" id="pt-input-nom"   type="text"  placeholder="Prénom" autocomplete="given-name">
+      <input class="pt-input" id="pt-input-email" type="email" placeholder="Email"  autocomplete="email">
+      <div style="height:8px"></div>
+      <button class="pt-btn" id="pt-btn-continuer">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ÉCRAN 2 — Options de partage -->
+  <div class="pt-screen" id="pt-screen-share">
+    <div class="pt-hdr">
+      <a class="pt-back" id="pt-back-2" href="/mes-voyages">← Retour</a>
+      <div class="pt-sec-lbl">Partager</div>
+      <div class="pt-nom" id="pt-nom-2"></div>
+    </div>
+
+    <div class="pt-block">
+      <div class="pt-sec-lbl">Lien de partage</div>
+      <div class="pt-link-box">
+        <div class="pt-link-url" id="pt-link-url">—</div>
+      </div>
+      <button class="pt-btn pt-btn-outline" id="pt-copy-btn">Copier le lien</button>
+    </div>
+
+    <div class="pt-block">
+      <div class="pt-sec-lbl">
+        Message
+        <span class="pt-gen-note" id="pt-gen-note">Génération en cours…</span>
+      </div>
+      <textarea class="pt-textarea" id="pt-msg" placeholder=""></textarea>
+    </div>
+
+    <div style="padding:12px 20px 0"><div class="pt-sec-lbl">Envoyer via</div></div>
+
+    <div id="pt-wa-row" class="pt-send-row">
+      <div class="pt-send-icon">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M8 1.5A6.5 6.5 0 0 0 2.07 11.1L1.5 14.5l3.5-.56A6.5 6.5 0 1 0 8 1.5Z"
+                stroke="#7A756D" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M5.8 6.3c.1.5.5 1.3 1.1 1.9.6.6 1.4 1 1.8 1.1"
+                stroke="#7A756D" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="pt-send-info">
+        <div class="pt-send-name">WhatsApp</div>
+        <div class="pt-send-sub" id="pt-wa-sub">Envoyer via WhatsApp</div>
+      </div>
+      <div class="pt-arr">›</div>
+    </div>
+
+    <div id="pt-email-row" class="pt-send-row">
+      <div class="pt-send-icon">
+        <svg viewBox="0 0 16 16" fill="none">
+          <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="#7A756D" stroke-width="1.2"/>
+          <path d="M1.5 5.5 8 9.5l6.5-4" stroke="#7A756D" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="pt-send-info">
+        <div class="pt-send-name">Email</div>
+        <div class="pt-send-sub" id="pt-email-sub">Envoyer par email</div>
+      </div>
+      <div class="pt-arr">›</div>
+    </div>
+
+    <div id="pt-sms-row" class="pt-send-row">
+      <div class="pt-send-icon">
+        <div class="pt-send-icon-txt">SMS</div>
+      </div>
+      <div class="pt-send-info">
+        <div class="pt-send-name">Message</div>
+        <div class="pt-send-sub">Envoyer par SMS</div>
+      </div>
+      <div class="pt-arr">›</div>
+    </div>
+
+    <div style="height:32px"></div>
+  </div>
+
+</div>
+
+<div class="pt-toast" id="pt-toast"></div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:       'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID:   'appFVKKftkjTeYrO7',
+    CLAUDE_KEY:'YOUR_ANTHROPIC_API_KEY', // Remplacer par votre clé Anthropic
+
+    TABLES: {
+      VOYAGE: 'tblpDZfQ72KQzXhEr',
+    },
+
+    PAGES: {
+      DASHBOARD:      '/mon-dashboard',
+      VUE_PARTENAIRE: 'https://andora90.github.io/allset/vue-partenaire/',
+    },
+
+    F: {
+      nomVoyage:       'nom_voyage',
+      dateDepart:      'date_depart',
+      dateRetour:      'date_retour',
+      profilVoyage:    'profil_voyage',
+      shareToken:      'share_token',
+      partenaires:     'partenaires',
+      partenaireEmail: 'partenaire_email',
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  const FR_MONTHS = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+
+  function parseDate(iso) {
+    if (!iso) return null;
+    const d = new Date(iso.substring(0,10) + 'T00:00:00');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function fmtDate(iso) {
+    const d = parseDate(iso);
+    if (!d) return '';
+    return `${d.getDate()} ${FR_MONTHS[d.getMonth()]}`;
+  }
+
+  function dateRange(depIso, retIso) {
+    const dep = parseDate(depIso);
+    const ret = parseDate(retIso);
+    if (!dep) return '';
+    if (!ret) return fmtDate(depIso);
+    if (dep.getMonth() === ret.getMonth() && dep.getFullYear() === ret.getFullYear()) {
+      return `${dep.getDate()} → ${fmtDate(retIso)} ${dep.getFullYear()}`;
+    }
+    return `${fmtDate(depIso)} → ${fmtDate(retIso)} ${ret.getFullYear()}`;
+  }
+
+  function generateUUID() {
+    return crypto.randomUUID
+      ? crypto.randomUUID()
+      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0;
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('pt-toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function showScreen(id) {
+    document.getElementById('pt-loading').style.display = 'none';
+    document.querySelectorAll('.pt-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE
+  ═══════════════════════════════════════════════════════════════ */
+  const hdrs = {
+    Authorization:  `Bearer ${CFG.PAT}`,
+    'Content-Type': 'application/json',
+  };
+
+  async function fetchVoyageById(id) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}/${id}`,
+      { headers: hdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    return res.json();
+  }
+
+  async function fetchVoyageByToken(token) {
+    const formula = encodeURIComponent(`{share_token}="${token}"`);
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}?filterByFormula=${formula}&maxRecords=1`,
+      { headers: hdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    const data = await res.json();
+    return data.records?.[0] || null;
+  }
+
+  async function patchVoyage(id, fields) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}/${id}`,
+      { method:'PATCH', headers: hdrs, body: JSON.stringify({ fields }) }
+    );
+    if (!res.ok) throw new Error(`Airtable PATCH ${res.status}`);
+    return res.json();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     GÉNÉRATION MESSAGE (Claude)
+  ═══════════════════════════════════════════════════════════════ */
+  async function generateMessage(nomVoyage, dates, partenaireNom, shareUrl) {
+    if (!CFG.CLAUDE_KEY || CFG.CLAUDE_KEY.startsWith('YOUR_')) {
+      return `Bonjour ${partenaireNom},\n\nJe te partage les détails de notre voyage "${nomVoyage}" (${dates}). Tu peux consulter les étapes et suivre la préparation en temps réel via ce lien :\n\n${shareUrl}`;
+    }
+
+    try {
+      const prompt = `Génère un message de partage court et chaleureux (3-4 phrases) en français, à destination de "${partenaireNom}", pour l'inviter à consulter le voyage "${nomVoyage}" (${dates}) via ce lien : ${shareUrl}. Ton naturel et amical, sans emoji. Termine le message par le lien seul sur une nouvelle ligne.`;
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key':                             CFG.CLAUDE_KEY,
+          'anthropic-version':                     '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+          'content-type':                          'application/json',
+        },
+        body: JSON.stringify({
+          model:      'claude-haiku-4-5-20251001',
+          max_tokens: 300,
+          messages:   [{ role:'user', content: prompt }],
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Claude ${res.status}`);
+      const data = await res.json();
+      return data.content?.[0]?.text || '';
+    } catch {
+      return `Bonjour ${partenaireNom},\n\nJe te partage les détails de notre voyage "${nomVoyage}" (${dates}). Tu peux consulter les étapes et suivre la préparation via ce lien :\n\n${shareUrl}`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     ÉCRAN PARTAGE
+  ═══════════════════════════════════════════════════════════════ */
+  function showShareScreen(voyage, token) {
+    const F   = CFG.F;
+    const f   = voyage.fields || {};
+    const nom = f[F.nomVoyage]    || 'Voyage';
+    const pNom = f[F.partenaires] || '';
+    const pEmail = f[F.partenaireEmail] || '';
+    const dates = dateRange(f[F.dateDepart], f[F.dateRetour]);
+
+    const shareUrl = `${window.location.origin}${CFG.PAGES.VUE_PARTENAIRE}?token=${token}`;
+
+    document.getElementById('pt-nom-2').textContent   = nom;
+    document.getElementById('pt-back-2').href         = `${CFG.PAGES.DASHBOARD}?recordId=${voyage.id}`;
+    document.getElementById('pt-link-url').textContent = shareUrl;
+
+    if (pNom) {
+      document.getElementById('pt-wa-sub').textContent    = `Envoyer à ${pNom}`;
+      document.getElementById('pt-email-sub').textContent = pEmail ? `Envoyer à ${pEmail}` : 'Envoyer par email';
+    }
+
+    showScreen('pt-screen-share');
+
+    // Copier le lien
+    document.getElementById('pt-copy-btn').onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('Lien copié');
+      } catch {
+        showToast('Copiez : ' + shareUrl);
+      }
+    };
+
+    // Génération message async
+    generateMessage(nom, dates, pNom, shareUrl).then(msg => {
+      document.getElementById('pt-msg').value      = msg;
+      document.getElementById('pt-gen-note').style.display = 'none';
+    });
+
+    // Boutons envoi
+    document.getElementById('pt-wa-row').onclick = () => {
+      const msg = encodeURIComponent(document.getElementById('pt-msg').value);
+      window.open(`https://wa.me/?text=${msg}`, '_blank');
+    };
+
+    document.getElementById('pt-email-row').onclick = () => {
+      const msg     = document.getElementById('pt-msg').value;
+      const subject = encodeURIComponent(`Voyage : ${nom}`);
+      const body    = encodeURIComponent(msg);
+      const to      = pEmail || '';
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    };
+
+    document.getElementById('pt-sms-row').onclick = () => {
+      const msg = encodeURIComponent(document.getElementById('pt-msg').value);
+      window.location.href = `sms:?body=${msg}`;
+    };
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     ÉCRAN FORMULAIRE
+  ═══════════════════════════════════════════════════════════════ */
+  function showFormScreen(voyage, existingToken = null) {
+    const f = voyage.fields || {};
+    document.getElementById('pt-nom-1').textContent = f[CFG.F.nomVoyage] || 'Voyage';
+    document.getElementById('pt-back-1').href       = `${CFG.PAGES.DASHBOARD}?recordId=${voyage.id}`;
+
+    // Pré-remplir si données partielles
+    if (f[CFG.F.partenaires])     document.getElementById('pt-input-nom').value   = f[CFG.F.partenaires];
+    if (f[CFG.F.partenaireEmail]) document.getElementById('pt-input-email').value = f[CFG.F.partenaireEmail];
+
+    showScreen('pt-screen-form');
+
+    document.getElementById('pt-btn-continuer').onclick = async () => {
+      const nomVal   = document.getElementById('pt-input-nom').value.trim();
+      const emailVal = document.getElementById('pt-input-email').value.trim();
+
+      if (!nomVal || !emailVal) {
+        showToast('Prénom et email requis');
+        return;
+      }
+
+      const btn = document.getElementById('pt-btn-continuer');
+      btn.disabled    = true;
+      btn.textContent = 'Enregistrement…';
+
+      try {
+        const token  = existingToken || generateUUID();
+        const fields = {
+          [CFG.F.partenaires]:     nomVal,
+          [CFG.F.partenaireEmail]: emailVal,
+        };
+        if (!existingToken) fields[CFG.F.shareToken] = token;
+        const updated = await patchVoyage(voyage.id, fields);
+        showShareScreen(updated, token);
+      } catch (err) {
+        btn.disabled    = false;
+        btn.textContent = 'Continuer →';
+        showToast('Erreur — réessayez');
+        console.error('[Allset] patch:', err);
+      }
+    };
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('token');
+    const record = params.get('record');
+
+    try {
+      if (token) {
+        // Arrivée avec token → chercher le voyage
+        const voyage = await fetchVoyageByToken(token);
+        if (!voyage) throw new Error('Voyage introuvable pour ce lien.');
+        const hasPartner = voyage.fields?.[CFG.F.partenaires] && voyage.fields?.[CFG.F.partenaireEmail];
+        if (hasPartner) {
+          showShareScreen(voyage, token);
+        } else {
+          // Token existant mais partenaire non renseigné → formulaire en premier
+          showFormScreen(voyage, token);
+        }
+
+      } else if (record) {
+        // Arrivée depuis le dashboard → charger le voyage
+        const voyage = await fetchVoyageById(record);
+        const f      = voyage.fields || {};
+        const existingToken = f[CFG.F.shareToken];
+        const hasPartner    = f[CFG.F.partenaires] && f[CFG.F.partenaireEmail];
+
+        if (existingToken && hasPartner) {
+          // Tout est prêt → partage direct
+          showShareScreen(voyage, existingToken);
+
+        } else if (hasPartner && !existingToken) {
+          // Partenaire connu, token manquant → générer le token et afficher
+          const newToken = generateUUID();
+          const updated  = await patchVoyage(record, { [CFG.F.shareToken]: newToken });
+          showShareScreen(updated, newToken);
+
+        } else {
+          // Partenaire inconnu → formulaire
+          showFormScreen(voyage);
+        }
+
+      } else {
+        document.getElementById('pt-loading').innerHTML =
+          '<div style="padding:32px 20px;text-align:center;color:#B8B0A4">Paramètre manquant.<br>Ouvrez cette page depuis un voyage.</div>';
+      }
+
+    } catch (err) {
+      console.error('[Allset] partager:', err);
+      document.getElementById('pt-loading').innerHTML =
+        `<div style="padding:32px 20px;text-align:center;color:#B8B0A4">
+          Impossible de charger le voyage.<br>
+          <small style="color:#DDD6C8">${err.message}</small>
+        </div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT — compatible SPA Softr
+  ═══════════════════════════════════════════════════════════════ */
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => true).then(init);
+  } else {
+    setTimeout(init, 400);
+  }
+
+</script>

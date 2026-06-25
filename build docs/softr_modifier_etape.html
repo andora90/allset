@@ -1,0 +1,395 @@
+<!--
+  ALLSET — "Modifier une étape" Custom Code Block pour Softr
+  ──────────────────────────────────────────────────────────
+  Coller dans : Page Settings → Custom Code → Body
+  URL attendue : /modifier-etape?recordId=recXXX
+
+  Flux :
+  1. Charge l'étape (type, label, dates, statut)
+  2. Pré-remplit les 4 champs éditables
+  3. Submit → PATCH 03_ETAPE → redirect /detail-etape?recordId=recXXX
+-->
+
+<!-- ── FONTS ───────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ─────────────────────────────────────────────────────── -->
+<style>
+  .me {
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    background: #F3EFE6;
+    color: #1A1816;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  .me-hdr { padding: 16px 20px 20px; border-bottom: 1px solid #DDD6C8; }
+  .me-back {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; letter-spacing: .3px;
+    color: #7A756D; text-decoration: none; margin-bottom: 14px;
+    cursor: pointer;
+  }
+  .me-back:active { opacity: .6; }
+  .me-type-lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #7A756D; margin-bottom: 8px;
+  }
+  .me-hdr-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic; font-weight: 400;
+    font-size: 26px; line-height: 1.2;
+    color: #1A1816;
+  }
+
+  /* ── Form body ── */
+  .me-form { padding: 24px 20px 8px; }
+
+  /* ── Field group ── */
+  .me-group { margin-bottom: 24px; }
+  .me-label {
+    display: block;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #7A756D; margin-bottom: 8px;
+  }
+  .me-hint { font-size: 12px; color: #B8B0A4; margin-top: 6px; }
+
+  /* ── Inputs ── */
+  .me-input,
+  .me-select {
+    width: 100%; box-sizing: border-box;
+    background: #EBE6DC; border: 1px solid #DDD6C8; border-radius: 10px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 16px; color: #1A1816;
+    padding: 14px 16px;
+    outline: none; -webkit-appearance: none; appearance: none;
+    transition: border-color .15s;
+  }
+  .me-input:focus, .me-select:focus { border-color: #1A1816; }
+  .me-input::placeholder { color: #B8B0A4; }
+
+  /* ── Select wrapper ── */
+  .me-sel-wrap { position: relative; }
+  .me-sel-wrap::after {
+    content: '';
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #7A756D;
+    pointer-events: none;
+  }
+  .me-select { padding-right: 40px; cursor: pointer; }
+
+  /* ── Divider ── */
+  .me-div { height: 1px; background: #DDD6C8; margin: 0 0 24px; }
+
+  /* ── CTA ── */
+  .me-cta { padding: 8px 20px 40px; }
+  .me-btn {
+    display: block; width: 100%; padding: 18px;
+    background: #1A1816; color: #fff;
+    border: none; border-radius: 12px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 15px; font-weight: 600; letter-spacing: .3px;
+    cursor: pointer; text-align: center;
+    transition: opacity .15s;
+  }
+  .me-btn:disabled { opacity: .4; cursor: default; }
+  .me-btn:active:not(:disabled) { opacity: .75; }
+
+  /* ── Feedback ── */
+  .me-msg {
+    font-size: 13px; line-height: 1.5;
+    margin-top: 12px; padding: 12px 14px; border-radius: 8px;
+    display: none;
+  }
+  .me-msg.err { display: block; background: #FFF0EE; color: #C0392B; }
+  .me-msg.ok  { display: block; background: #F0FBF2; color: #1E7A35; }
+
+  /* ── Loading / error states ── */
+  .me-loading {
+    padding: 48px 20px; text-align: center;
+    font-size: 14px; color: #B8B0A4;
+  }
+</style>
+
+<!-- ── MARKUP ─────────────────────────────────────────────────────── -->
+<div class="me" id="me-root">
+  <div class="me-loading">Chargement…</div>
+</div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+
+    TABLES: {
+      ETAPE: 'tblH5zDlgVMerNdhi',   // 03_ETAPE
+    },
+
+    PAGES: {
+      DETAIL_ETAPE: '/detail-etape',
+    },
+
+    FIELDS: {
+      ETAPE: {
+        typeEtape:          'type_etape',
+        label:              'label',
+        dateDebut:          'date_etape',
+        dateFin:            'date_fin',
+        statutConfirmation: 'statut_confirmation',
+      },
+    },
+
+    STATUTS: [
+      { value: 'À confirmer', label: 'À confirmer' },
+      { value: 'Confirmé',    label: 'Confirmé'    },
+      { value: 'Annulé',      label: 'Annulé'      },
+    ],
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  function getRecordId() {
+    const tpl = '{record_id}';
+    if (tpl !== '{record_id}' && tpl.startsWith('rec')) return tpl;
+    const q = new URLSearchParams(window.location.search).get('recordId')
+           || new URLSearchParams(window.location.search).get('record_id');
+    if (q?.startsWith('rec')) return q;
+    return window.location.pathname.split('/').find(s => s.startsWith('rec')) || null;
+  }
+
+  const readHdrs  = { Authorization: `Bearer ${CFG.PAT}` };
+  const writeHdrs = { Authorization: `Bearer ${CFG.PAT}`, 'Content-Type': 'application/json' };
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE
+  ═══════════════════════════════════════════════════════════════ */
+
+  // Single record — pas de fields[] (→ 422)
+  async function fetchEtape(recordId) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.ETAPE}/${recordId}`,
+      { headers: readHdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status} sur ETAPE/${recordId}`);
+    return res.json();
+  }
+
+  async function patchEtape(recordId, fields) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.ETAPE}/${recordId}`,
+      { method: 'PATCH', headers: writeHdrs, body: JSON.stringify({ fields }) }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Airtable ${res.status}`);
+    }
+    return res.json();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     ÉTAT LOCAL
+  ═══════════════════════════════════════════════════════════════ */
+  let state = {
+    recordId: null,
+    typeEtape: '',
+    label: '',
+    dateDebut: '',
+    dateFin: '',
+    statut: '',
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU
+  ═══════════════════════════════════════════════════════════════ */
+  function buildHTML() {
+    const FE = CFG.FIELDS.ETAPE;
+    const backUrl = `${CFG.PAGES.DETAIL_ETAPE}?recordId=${state.recordId}`;
+
+    const statutOptions = CFG.STATUTS.map(s =>
+      `<option value="${s.value}" ${state.statut === s.value ? 'selected' : ''}>${s.label}</option>`
+    ).join('');
+
+    return `
+      <div class="me-hdr">
+        <div class="me-back" onclick="window.location.href='${backUrl}'">← Retour à l'étape</div>
+        ${state.typeEtape ? `<div class="me-type-lbl">${state.typeEtape.toUpperCase()}</div>` : ''}
+        <div class="me-hdr-title">${state.label || 'Modifier l\'étape'}</div>
+      </div>
+
+      <div class="me-form">
+
+        <!-- Label -->
+        <div class="me-group">
+          <label class="me-label" for="me-label">Nom de l'étape</label>
+          <input class="me-input" id="me-label" type="text"
+                 value="${escHtml(state.label)}"
+                 placeholder="ex : Vol Paris → Barcelone, Hôtel Arts…"
+                 maxlength="200" autocomplete="off">
+        </div>
+
+        <div class="me-div"></div>
+
+        <!-- Dates début / fin -->
+        <div class="me-group">
+          <label class="me-label">Dates</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <div class="me-hint" style="margin:0 0 6px">Début</div>
+              <input class="me-input" id="me-date-debut" type="date" value="${state.dateDebut}">
+            </div>
+            <div>
+              <div class="me-hint" style="margin:0 0 6px">Fin <span style="font-size:11px">(facultatif)</span></div>
+              <input class="me-input" id="me-date-fin" type="date" value="${state.dateFin}">
+            </div>
+          </div>
+          <div class="me-hint">Ex : check-in / check-out hôtel, dates de location…</div>
+        </div>
+
+        <div class="me-div"></div>
+
+        <!-- Statut de confirmation -->
+        <div class="me-group">
+          <label class="me-label" for="me-statut">Statut</label>
+          <div class="me-sel-wrap">
+            <select class="me-select" id="me-statut">
+              <option value="">— Non renseigné —</option>
+              ${statutOptions}
+            </select>
+          </div>
+        </div>
+
+      </div><!-- /.me-form -->
+
+      <div class="me-cta">
+        <button class="me-btn" id="me-btn" type="button">Enregistrer les modifications</button>
+        <div class="me-msg" id="me-msg"></div>
+      </div>
+    `;
+  }
+
+  function escHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function mount() {
+    document.getElementById('me-root').innerHTML = buildHTML();
+    document.getElementById('me-btn').addEventListener('click', handleSubmit);
+  }
+
+  function showMsg(text, type) {
+    const el = document.getElementById('me-msg');
+    el.textContent = text;
+    el.className = `me-msg ${type}`;
+  }
+
+  function hideMsg() {
+    const el = document.getElementById('me-msg');
+    el.className = 'me-msg';
+    el.textContent = '';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SUBMIT HANDLER
+  ═══════════════════════════════════════════════════════════════ */
+  async function handleSubmit() {
+    const label     = document.getElementById('me-label').value.trim();
+    const dateDebut = document.getElementById('me-date-debut').value;
+    const dateFin   = document.getElementById('me-date-fin').value;
+    const statut    = document.getElementById('me-statut').value;
+
+    if (!label) {
+      showMsg('Merci de saisir un nom pour cette étape.', 'err');
+      document.getElementById('me-label').focus();
+      return;
+    }
+    if (dateFin && dateDebut && dateFin < dateDebut) {
+      showMsg('La date de fin doit être postérieure au début.', 'err');
+      document.getElementById('me-date-fin').focus();
+      return;
+    }
+
+    const btn = document.getElementById('me-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Enregistrement…';
+    hideMsg();
+
+    try {
+      const FE = CFG.FIELDS.ETAPE;
+
+      const fields = {
+        [FE.label]:     label,
+        [FE.dateDebut]: dateDebut || null,
+        [FE.dateFin]:   dateFin   || null,
+      };
+      if (statut) fields[FE.statutConfirmation] = statut;
+
+      await patchEtape(state.recordId, fields);
+
+      showMsg('Modifications enregistrées !', 'ok');
+      setTimeout(() => {
+        window.location.href = `${CFG.PAGES.DETAIL_ETAPE}?recordId=${state.recordId}`;
+      }, 700);
+
+    } catch (err) {
+      console.error('[Allset] modifier-etape:', err);
+      showMsg(`Erreur : ${err.message}`, 'err');
+      btn.disabled    = false;
+      btn.textContent = 'Enregistrer les modifications';
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const recordId = getRecordId();
+    if (!recordId) {
+      document.getElementById('me-root').innerHTML =
+        '<div class="me-loading">Ouvrez cette page depuis le détail d\'une étape.</div>';
+      return;
+    }
+
+    state.recordId = recordId;
+
+    try {
+      const etape = await fetchEtape(recordId);
+      const FE    = CFG.FIELDS.ETAPE;
+      const f     = etape.fields || {};
+
+      state.typeEtape = f[FE.typeEtape]          || '';
+      state.label     = f[FE.label]              || '';
+      state.dateDebut = f[FE.dateDebut]          || '';
+      state.dateFin   = f[FE.dateFin]            || '';
+      state.statut    = f[FE.statutConfirmation] || '';
+
+      mount();
+    } catch (err) {
+      console.error('[Allset] modifier-etape init:', err);
+      document.getElementById('me-root').innerHTML =
+        `<div class="me-loading">Impossible de charger l'étape (${err.message}).</div>`;
+    }
+  }
+
+  // Compatible SPA Softr
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => !!getRecordId()).then(init).catch(init);
+  } else {
+    setTimeout(init, 800);
+  }
+
+</script>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <script src="./deck-stage.js"></script>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <!-- ══════════════════════════════════════════════════
+       01 — COVER
+  ══════════════════════════════════════════════════ -->
+  <section data-label="01 — Couverture" data-screen-label="01" data-speaker-notes="Allset repense l'organisation du voyage famille — du problème concret à la solution évidente. Pitch investisseurs 2026." style="background:#1C1714; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="position:absolute; right:-240px; top:50%; transform:translateY(-50%); width:900px; height:900px; border-radius:50%; border:1px solid rgba(196,187,175,0.05); pointer-events:none;"></div>
+    <div style="position:absolute; right:-140px; top:50%; transform:translateY(-50%); width:640px; height:640px; border-radius:50%; border:1px solid rgba(141,91,76,0.09); pointer-events:none;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:34px; color:rgba(245,240,232,0.38); letter-spacing:0.5px;">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; letter-spacing:3px; color:rgba(245,240,232,0.18); text-transform:uppercase;">Confidentiel · 2026</div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:1000px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:5px; color:rgba(196,187,175,0.55); text-transform:uppercase; margin-bottom:40px;">Présentation investisseurs</div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300; font-size:112px; color:#F5F0E8; line-height:1.0; letter-spacing:-1px;">Le voyage famille,<br>réinventé.</div>
+      <div style="width:52px; height:1.5px; background:#8D5B4C; margin:44px 0;"></div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:32px; font-weight:300; color:rgba(245,240,232,0.42); max-width:580px; line-height:1.75;">Application mobile d'organisation voyage<br>pour les familles actives.</div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(196,187,175,0.1); padding-top:20px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.18); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.13);">01 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       02 — LE PROBLÈME
+  ══════════════════════════════════════════════════ -->
+  <section data-label="02 — Le Problème" data-screen-label="02" data-speaker-notes="3 à 4 voyages par an. Notes iPhone + Google Sheets + emails perdus. Zéro structure, tout repart de zéro. Et c'est toujours Marie qui porte." style="background:#1C1714; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="position:absolute; right:60px; bottom:20px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:420px; color:rgba(245,240,232,0.018); line-height:1; user-select:none; pointer-events:none;">2</div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:64px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(245,240,232,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(245,240,232,0.18); text-transform:uppercase;">Le Problème</div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:1040px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:5px; color:#8D5B4C; text-transform:uppercase; margin-bottom:40px;">01 — Le constat</div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300; font-size:84px; color:#F5F0E8; line-height:1.1; letter-spacing:-0.5px;">"Elle recommence à zéro.<br>À chaque voyage."</div>
+      <div style="width:40px; height:1.5px; background:#8D5B4C; margin:44px 0;"></div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:32px; font-weight:300; color:rgba(245,240,232,0.45); max-width:720px; line-height:1.8;">Marie porte seule l'organisation complète de chaque voyage — dans sa tête, sur des Notes iPhone, un Google Sheet recrée à chaque séjour. Trois outils, zéro structure, aucune possibilité de déléguer.</div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(196,187,175,0.1); padding-top:20px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.18); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.13);">02 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       03 — LE PERSONA : MARIE
+  ══════════════════════════════════════════════════ -->
+  <section data-label="03 — Le Persona" data-screen-label="03" data-speaker-notes="Marie, 35-45 ans, CSP+, cadre active, 2 enfants. Chief Travel Officer du foyer par défaut — rôle non choisi, non partagé. Irritants : repartir de zéro, tout dans la tête, ne peut pas déléguer." style="background:#F5F0E8; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="position:absolute; right:40px; top:0px; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600; font-size:560px; color:rgba(28,23,20,0.025); line-height:1; user-select:none; pointer-events:none;">M</div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:56px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(28,23,20,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(28,23,20,0.2); text-transform:uppercase;">Le Persona</div>
+    </div>
+
+    <div style="flex:1; display:flex; gap:0; align-items:stretch;">
+
+      <div style="flex:1.1; padding-right:80px; display:flex; flex-direction:column; justify-content:center;">
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:5px; color:#8D5B4C; text-transform:uppercase; margin-bottom:20px;">Utilisatrice cible</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:84px; color:#1C1714; line-height:0.95; letter-spacing:-1px; margin-bottom:24px;">Marie</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:30px; color:#6B6560; line-height:1.65; margin-bottom:44px;">35–45 ans · CSP+ · Cadre active · 2 enfants<br><span style="color:#8D5B4C; font-weight:500;">Chief Travel Officer du foyer — par défaut.</span></div>
+        <div style="display:flex; flex-direction:column; gap:24px;">
+          <div style="display:flex; gap:18px; align-items:flex-start;">
+            <div style="width:3px; height:3px; border-radius:50%; background:#8D5B4C; margin-top:12px; flex-shrink:0;"></div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; color:#C4BBAF; margin-bottom:5px;">Fonctionnel</div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#5C4742; line-height:1.55;">Organiser un voyage sans repartir de zéro, rien oublier</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:18px; align-items:flex-start;">
+            <div style="width:3px; height:3px; border-radius:50%; background:#8D5B4C; margin-top:12px; flex-shrink:0;"></div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; color:#C4BBAF; margin-bottom:5px;">Émotionnel</div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#5C4742; line-height:1.55;">Partir sereine — pas épuisée avant de décoller</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:18px; align-items:flex-start;">
+            <div style="width:3px; height:3px; border-radius:50%; background:#8D5B4C; margin-top:12px; flex-shrink:0;"></div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; color:#C4BBAF; margin-bottom:5px;">Social</div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#5C4742; line-height:1.55;">Rendre l'organisation visible et délégable sans friction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.12); flex-shrink:0;"></div>
+
+      <div style="flex:0.9; padding-left:80px; display:flex; flex-direction:column; justify-content:center;">
+        <div style="padding:32px 0; border-bottom:1px solid rgba(92,71,66,0.1);">
+          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:96px; color:#1C1714; line-height:1; letter-spacing:-2px;">3–4</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#C4BBAF; margin-top:8px;">voyages par an par famille CSP+</div>
+        </div>
+        <div style="padding:32px 0; border-bottom:1px solid rgba(92,71,66,0.1);">
+          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:96px; color:#1C1714; line-height:1; letter-spacing:-2px;">100%</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#C4BBAF; margin-top:8px;">de la charge mentale voyage portée seule</div>
+        </div>
+        <div style="padding:32px 0;">
+          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:96px; color:#1C1714; line-height:1; letter-spacing:-2px;">0</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#C4BBAF; margin-top:8px;">outil dédié dans sa vie aujourd'hui</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(92,71,66,0.12); padding-top:20px; margin-top:40px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.22); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.18);">03 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       04 — LES 3 IRRITANTS
+  ══════════════════════════════════════════════════ -->
+  <section data-label="04 — Les 3 Irritants" data-screen-label="04" data-speaker-notes="Trois irritants structurels. 1/ Repartir de zéro — l'ossature n'est jamais mémorisée. 2/ Tout dans la tête — le partenaire n'a aucune visibilité. 3/ Impossible à déléguer — partager crée plus de friction qu'il n'en résout." style="background:#F5F0E8; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(28,23,20,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(28,23,20,0.2); text-transform:uppercase;">Les Irritants</div>
+    </div>
+
+    <div style="margin-bottom:48px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:58px; color:#1C1714; letter-spacing:-0.5px;">Trois irritants récurrents</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#C4BBAF; margin-top:8px;">Identifiés sur le profil Marie, validés à chaque voyage</div>
+    </div>
+
+    <div style="flex:1; display:flex; gap:0; align-items:stretch;">
+
+      <div style="flex:1; padding-right:72px; display:flex; flex-direction:column; justify-content:flex-start; padding-top:8px;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:130px; color:#1C1714; line-height:1; opacity:0.06; margin-bottom:-16px; user-select:none;">01</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#8D5B4C; margin-bottom:18px; opacity:0.85;">Repartir de zéro</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:50px; color:#1C1714; line-height:1.1; margin-bottom:24px; letter-spacing:-0.3px;">Aucune structure<br>mémorisée</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#6B6560; line-height:1.7;">À chaque nouveau voyage, Marie recrée l'ossature depuis zéro. Aucun système ne retient ce qu'elle a déjà construit.</div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.12); flex-shrink:0;"></div>
+
+      <div style="flex:1; padding:8px 72px 0; display:flex; flex-direction:column; justify-content:flex-start;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:130px; color:#1C1714; line-height:1; opacity:0.06; margin-bottom:-16px; user-select:none;">02</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#8D5B4C; margin-bottom:18px; opacity:0.85;">Tout dans sa tête</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:50px; color:#1C1714; line-height:1.1; margin-bottom:24px; letter-spacing:-0.3px;">Charge mentale<br>invisible</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#6B6560; line-height:1.7;">L'état d'avancement de l'organisation n'existe que dans sa tête. Son partenaire n'a aucune visibilité.</div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.12); flex-shrink:0;"></div>
+
+      <div style="flex:1; padding:8px 0 0 72px; display:flex; flex-direction:column; justify-content:flex-start;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:130px; color:#1C1714; line-height:1; opacity:0.06; margin-bottom:-16px; user-select:none;">03</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#8D5B4C; margin-bottom:18px; opacity:0.85;">Impossible à déléguer</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:50px; color:#1C1714; line-height:1.1; margin-bottom:24px; letter-spacing:-0.3px;">Partager crée<br>plus de friction</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#6B6560; line-height:1.7;">Pour déléguer une tâche, elle doit tout réexpliquer. Partager un Google Sheet crée plus de questions qu'il n'en résout.</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(92,71,66,0.12); padding-top:20px; margin-top:40px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.22); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.18);">04 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       05 — LA SOLUTION
+  ══════════════════════════════════════════════════ -->
+  <section data-label="05 — La Solution" data-screen-label="05" data-speaker-notes="Allset : un moule de voyage réutilisable. Il génère automatiquement les checklists par type d'étape. Un seul écran pour l'état de l'organisation. Un lien pour partager sans téléchargement." style="background:#1C1714; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="position:absolute; left:-180px; top:50%; transform:translateY(-50%); width:700px; height:700px; border-radius:50%; border:1px solid rgba(141,91,76,0.1); pointer-events:none;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:60px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(245,240,232,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(245,240,232,0.18); text-transform:uppercase;">La Solution</div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:5px; color:#8D5B4C; text-transform:uppercase; margin-bottom:32px;">02 — La réponse</div>
+      <div style="display:flex; align-items:flex-end; gap:36px; margin-bottom:44px;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300; font-size:148px; color:#F5F0E8; line-height:0.9; letter-spacing:-2px;">Allset</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:30px; font-weight:300; color:rgba(245,240,232,0.38); padding-bottom:22px; max-width:420px; line-height:1.7;">structure votre voyage en étapes et génère automatiquement ce qu'il faut vérifier pour chacune.</div>
+      </div>
+      <div style="width:40px; height:1.5px; background:#8D5B4C; margin-bottom:44px;"></div>
+      <div style="display:flex; gap:80px;">
+        <div style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:44px; color:#8D5B4C; line-height:1; margin-top:3px; opacity:0.75;">01</div>
+          <div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:28px; font-weight:500; color:#F5F0E8; margin-bottom:6px;">Structure mémorisée</div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.38); line-height:1.6; max-width:300px;">Un moule de voyage réutilisable à chaque séjour</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:44px; color:#8D5B4C; line-height:1; margin-top:3px; opacity:0.75;">02</div>
+          <div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:28px; font-weight:500; color:#F5F0E8; margin-bottom:6px;">Checklists intelligentes</div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.38); line-height:1.6; max-width:300px;">Générées automatiquement par type d'étape</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:44px; color:#8D5B4C; line-height:1; margin-top:3px; opacity:0.75;">03</div>
+          <div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:28px; font-weight:500; color:#F5F0E8; margin-bottom:6px;">Partage en un lien</div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.38); line-height:1.6; max-width:300px;">Vue partenaire sans téléchargement, synchronisée</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(196,187,175,0.1); padding-top:20px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.18); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.13);">05 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       06 — COMMENT ÇA MARCHE
+  ══════════════════════════════════════════════════ -->
+  <section data-label="06 — Comment ça marche" data-screen-label="06" data-speaker-notes="Trois gestes : créer le voyage, laisser Allset générer les checklists automatiquement, partager en un lien. Valeur dès la première étape — sans template, sans configuration préalable." style="background:#F5F0E8; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(28,23,20,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(28,23,20,0.2); text-transform:uppercase;">Comment ça marche</div>
+    </div>
+
+    <div style="margin-bottom:56px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:58px; color:#1C1714; letter-spacing:-0.5px;">Simple. Immédiat. Réutilisable.</div>
+    </div>
+
+    <div style="flex:1; display:flex; gap:0; align-items:stretch;">
+
+      <div style="flex:1; padding-right:56px; display:flex; flex-direction:column; justify-content:flex-start;">
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px;">
+          <div style="width:52px; height:52px; border-radius:50%; border:1px solid rgba(92,71,66,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <div style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:34px; color:#8D5B4C; line-height:1;">1</div>
+          </div>
+          <div style="height:1px; flex:1; background:rgba(92,71,66,0.15);"></div>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#C4BBAF; margin-bottom:16px;">Créer</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:50px; color:#1C1714; line-height:1.1; margin-bottom:24px; letter-spacing:-0.3px;">Vous créez<br>votre voyage</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#6B6560; line-height:1.7;">Titre, dates, destination, participants. Allset est prêt en moins d'une minute.</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:0 8px; flex-shrink:0; padding-bottom:80px;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:62px; color:rgba(92,71,66,0.18); line-height:1;">→</div>
+      </div>
+
+      <div style="flex:1; padding:0 56px; display:flex; flex-direction:column; justify-content:flex-start;">
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:#1C1714; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <div style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:34px; color:#F5F0E8; line-height:1;">2</div>
+          </div>
+          <div style="height:1px; flex:1; background:rgba(92,71,66,0.15);"></div>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#C4BBAF; margin-bottom:16px;">Générer</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:50px; color:#1C1714; line-height:1.1; margin-bottom:24px; letter-spacing:-0.3px;">Allset génère<br>vos checklists</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#6B6560; line-height:1.7;">Automatiquement par type d'étape — vol, hôtel, location voiture, logement. Chaque étape a sa checklist pré-remplie et éditable.</div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:0 8px; flex-shrink:0; padding-bottom:80px;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:62px; color:rgba(92,71,66,0.18); line-height:1;">→</div>
+      </div>
+
+      <div style="flex:1; padding-left:56px; display:flex; flex-direction:column; justify-content:flex-start;">
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px;">
+          <div style="width:52px; height:52px; border-radius:50%; border:1px solid rgba(92,71,66,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <div style="font-family:'Cormorant Garamond',serif; font-weight:600; font-size:34px; color:#8D5B4C; line-height:1;">3</div>
+          </div>
+          <div style="height:1px; flex:1; background:rgba(92,71,66,0.15);"></div>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#C4BBAF; margin-bottom:16px;">Partager</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:50px; color:#1C1714; line-height:1.1; margin-bottom:24px; letter-spacing:-0.3px;">Vous partagez<br>en un lien</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#6B6560; line-height:1.7;">Votre partenaire voit et coche sans télécharger d'app. Synchronisation en temps réel.</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(92,71,66,0.12); padding-top:20px; margin-top:40px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.22); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.18);">06 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       07 — LE MOMENT AHA
+  ══════════════════════════════════════════════════ -->
+  <section data-label="07 — Le Moment Aha" data-screen-label="07" data-speaker-notes="Le moment aha : Marie ajoute 'Vol Paris → Barcelone'. Allset génère instantanément 8 items — dont 2 qu'elle aurait oubliés. Valeur perçue dès la première étape, sans configuration." style="background:#F5F0E8; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(28,23,20,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(28,23,20,0.2); text-transform:uppercase;">Le Moment Aha</div>
+    </div>
+
+    <div style="margin-bottom:48px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:58px; color:#1C1714; letter-spacing:-0.5px;">La valeur, dès la première étape créée.</div>
+    </div>
+
+    <div style="flex:1; display:flex; gap:72px; align-items:center;">
+
+      <div style="flex:1; background:#fff; border:1px solid rgba(92,71,66,0.1); border-radius:3px; padding:40px 44px; position:relative;">
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#C4BBAF; margin-bottom:20px;">Marie saisit</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:42px; color:#1C1714; line-height:1.1; margin-bottom:28px; letter-spacing:-0.5px;">Vol Paris → Barcelone</div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:#F5F0E8; border:1px solid rgba(92,71,66,0.15); display:flex; align-items:center; justify-content:center; font-size:28px;">✈</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#C4BBAF;">Type : Vol · Sélectionné</div>
+        </div>
+        <div style="position:absolute; top:16px; right:16px; font-family:'DM Sans',sans-serif; font-size:24px; color:#A5978B; background:#F5F0E8; padding:4px 12px; border-radius:20px; letter-spacing:1px; text-transform:uppercase;">Saisie</div>
+      </div>
+
+      <div style="display:flex; align-items:center; flex-shrink:0;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:64px; color:#1C1714; line-height:1; opacity:0.12;">→</div>
+      </div>
+
+      <div style="flex:1.1; background:#1C1714; border-radius:3px; padding:40px 44px;">
+        <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:rgba(196,187,175,0.5); margin-bottom:8px;">Allset génère instantanément</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:80px; color:#F5F0E8; line-height:1; margin-bottom:4px; letter-spacing:-1px;">8</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:rgba(245,240,232,0.4); margin-bottom:28px;">items de checklist</div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:16px; height:16px; border-radius:3px; background:#8D5B4C; flex-shrink:0; display:flex; align-items:center; justify-content:center;"><div style="color:#F5F0E8; font-size:24px; font-weight:700; line-height:1;">✓</div></div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.65);">Billet confirmé (n° réservation + email)</div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:16px; height:16px; border-radius:3px; background:#8D5B4C; flex-shrink:0; display:flex; align-items:center; justify-content:center;"><div style="color:#F5F0E8; font-size:24px; font-weight:700; line-height:1;">✓</div></div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.65);">Check-in en ligne fait</div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:16px; height:16px; border-radius:3px; border:1px solid rgba(196,187,175,0.2); flex-shrink:0;"></div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.32);">Autorisation de sortie du territoire…</div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:16px; height:16px; border-radius:3px; border:1px solid rgba(196,187,175,0.2); flex-shrink:0;"></div>
+            <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:rgba(245,240,232,0.32);">Heure de présentation aéroport…</div>
+          </div>
+        </div>
+        <div style="background:rgba(141,91,76,0.18); border:1px solid rgba(141,91,76,0.32); border-radius:2px; padding:12px 16px;">
+          <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:#C4BBAF; line-height:1.5;">Dont <span style="color:#F5F0E8; font-weight:500;">2 items qu'elle aurait oubliés</span> — documents enfants, autorisation sortie territoire</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(92,71,66,0.12); padding-top:20px; margin-top:40px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.22); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.18);">07 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       08 — L'INTERFACE
+  ══════════════════════════════════════════════════ -->
+  <section data-label="08 — L'Interface" data-screen-label="08" data-speaker-notes="Trois écrans : le dashboard voyage avec statut de chaque étape, la checklist détaillée auto-générée, et la vue partenaire accessible par lien — sans téléchargement." style="background:#1C1714; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:28px; color:rgba(245,240,232,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; letter-spacing:4px; color:rgba(245,240,232,0.18); text-transform:uppercase;">L'Interface</div>
+    </div>
+
+    <div style="margin-bottom:44px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300; font-size:62px; color:#F5F0E8; letter-spacing:-0.5px;">Trois écrans. Une seule logique.</div>
+    </div>
+
+    <div style="flex:1; display:flex; justify-content:center; align-items:center; gap:64px;">
+
+      <!-- PHONE 1: Dashboard -->
+      <div style="display:flex; flex-direction:column; align-items:center; gap:20px;">
+        <div style="position:relative; width:224px; height:446px; border-radius:42px; background:#111; border:1.5px solid rgba(196,187,175,0.14); overflow:hidden; box-shadow:0 28px 72px rgba(0,0,0,0.65);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:88px; height:26px; background:#080604; border-radius:13px; z-index:10;"></div>
+          <div style="position:absolute; inset:0; background:#F0EBE1; border-radius:41px; overflow:hidden;">
+            <div style="height:148px; background:linear-gradient(155deg,#2E2010,#6B4822); position:relative;">
+              <div style="position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.72),rgba(0,0,0,0.04));"></div>
+              <div style="position:absolute; top:14px; left:14px; background:rgba(255,255,255,0.17); border-radius:4px; padding:4px 9px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; color:#fff; text-transform:uppercase;">À venir · 14 juil.</div>
+              <div style="position:absolute; bottom:12px; left:14px; font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:32px; color:#fff; line-height:1; font-weight:400;">Barcelone</div>
+            </div>
+            <div style="background:#fff; padding:9px 14px; border-bottom:1px solid rgba(0,0,0,0.06); display:flex; align-items:center; gap:8px;">
+              <div style="font-family:'DM Sans',sans-serif; font-size:17px; font-weight:700; color:#1C1714;">12</div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:#B8B0A4;">/&nbsp;22</div>
+              <div style="flex:1; height:2px; background:rgba(0,0,0,0.08); border-radius:1px; overflow:hidden;"><div style="width:55%; height:100%; background:#1C1714;"></div></div>
+            </div>
+            <div style="background:#fff;">
+              <div style="padding:10px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; align-items:center; gap:9px;">
+                <div style="font-size:17px;">✅</div>
+                <div style="flex:1;"><div style="font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; color:#1C1714;">Vol Paris → Barcelone</div><div style="font-family:'DM Sans',sans-serif; font-size:11px; color:#B8B0A4; margin-top:1px;">Calé · 5/8</div></div>
+              </div>
+              <div style="padding:10px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; align-items:center; gap:9px;">
+                <div style="font-size:17px;">⚡</div>
+                <div style="flex:1;"><div style="font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; color:#1C1714;">Hôtel Barceloneta</div><div style="font-family:'DM Sans',sans-serif; font-size:11px; color:#B8B0A4; margin-top:1px;">En cours · 3/5</div></div>
+              </div>
+              <div style="padding:10px 14px; display:flex; align-items:center; gap:9px;">
+                <div style="font-size:17px;">❌</div>
+                <div style="flex:1;"><div style="font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; color:#1C1714;">Location voiture</div><div style="font-family:'DM Sans',sans-serif; font-size:11px; color:#B8B0A4; margin-top:1px;">Manquant · 0/5</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'DM Sans',sans-serif; font-size:17px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.4);">Dashboard</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:18px; color:rgba(245,240,232,0.22); margin-top:4px;">Vue d'ensemble du voyage</div>
+        </div>
+      </div>
+
+      <!-- PHONE 2: Checklist -->
+      <div style="display:flex; flex-direction:column; align-items:center; gap:20px;">
+        <div style="position:relative; width:224px; height:446px; border-radius:42px; background:#111; border:1.5px solid rgba(196,187,175,0.14); overflow:hidden; box-shadow:0 28px 72px rgba(0,0,0,0.65);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:88px; height:26px; background:#080604; border-radius:13px; z-index:10;"></div>
+          <div style="position:absolute; inset:0; background:#fff; border-radius:41px; overflow:hidden;">
+            <div style="background:#fff; padding:44px 14px 12px; border-bottom:1px solid rgba(0,0,0,0.06);">
+              <div style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#C4BBAF; margin-bottom:4px;">Vol</div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#1C1714; margin-bottom:2px;">Paris → Barcelone</div>
+              <div style="display:flex; align-items:baseline; gap:3px; margin-top:8px;">
+                <div style="font-family:'DM Sans',sans-serif; font-size:28px; font-weight:700; color:#1C1714;">5</div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:18px; color:#C4BBAF;">/</div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:18px; color:#C4BBAF;">8</div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:17px; color:#C4BBAF; margin-left:3px;">validés</div>
+              </div>
+            </div>
+            <div>
+              <div style="padding:10px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:10px; align-items:flex-start;">
+                <div style="width:14px; height:14px; border-radius:3px; background:#1C1714; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center;"><div style="color:#F5F0E8; font-size:12px; line-height:1;">✓</div></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:#C4BBAF; text-decoration:line-through; line-height:1.4;">Billet confirmé (n° réservation)</div>
+              </div>
+              <div style="padding:10px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:10px; align-items:flex-start;">
+                <div style="width:14px; height:14px; border-radius:3px; background:#1C1714; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center;"><div style="color:#F5F0E8; font-size:12px; line-height:1;">✓</div></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:#C4BBAF; text-decoration:line-through; line-height:1.4;">Check-in en ligne fait</div>
+              </div>
+              <div style="padding:10px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:10px; align-items:flex-start;">
+                <div style="width:14px; height:14px; border-radius:3px; border:1.5px solid rgba(0,0,0,0.1); flex-shrink:0; margin-top:1px;"></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:#1C1714; line-height:1.4;">Visas &amp; autorisations vérifiés</div>
+              </div>
+              <div style="padding:10px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:10px; align-items:flex-start;">
+                <div style="width:14px; height:14px; border-radius:3px; border:1.5px solid rgba(0,0,0,0.1); flex-shrink:0; margin-top:1px;"></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:#1C1714; line-height:1.4;">Autorisation sortie du territoire</div>
+              </div>
+              <div style="padding:10px 14px; display:flex; gap:10px; align-items:flex-start;">
+                <div style="width:14px; height:14px; border-radius:3px; border:1.5px solid rgba(0,0,0,0.1); flex-shrink:0; margin-top:1px;"></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:#1C1714; line-height:1.4;">Heure de présentation aéroport</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'DM Sans',sans-serif; font-size:17px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.4);">Checklist</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:18px; color:rgba(245,240,232,0.22); margin-top:4px;">Auto-générée, éditable</div>
+        </div>
+      </div>
+
+      <!-- PHONE 3: Partner view -->
+      <div style="display:flex; flex-direction:column; align-items:center; gap:20px;">
+        <div style="position:relative; width:224px; height:446px; border-radius:42px; background:#111; border:1.5px solid rgba(196,187,175,0.14); overflow:hidden; box-shadow:0 28px 72px rgba(0,0,0,0.65);">
+          <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:88px; height:26px; background:#080604; border-radius:13px; z-index:10;"></div>
+          <div style="position:absolute; inset:0; background:#F0EBE1; border-radius:41px; overflow:hidden;">
+            <div style="background:#1C1714; padding:44px 14px 18px;">
+              <div style="font-family:'DM Sans',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.32); margin-bottom:6px;">Partagé par Marie</div>
+              <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:38px; color:#F5F0E8; font-weight:400; line-height:1;">Barcelone</div>
+              <div style="font-family:'DM Sans',sans-serif; font-size:14px; color:rgba(245,240,232,0.32); margin-top:4px;">14 → 21 juillet 2026</div>
+            </div>
+            <div style="background:#fff; padding:12px 14px; border-bottom:1px solid rgba(0,0,0,0.06);">
+              <div style="display:flex; align-items:baseline; gap:3px; margin-bottom:6px;">
+                <div style="font-family:'DM Sans',sans-serif; font-size:30px; font-weight:700; color:#1C1714;">10</div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:#C4BBAF;">&nbsp;/ 22</div>
+              </div>
+              <div style="height:2px; background:rgba(0,0,0,0.07); border-radius:1px; overflow:hidden;"><div style="width:45%; height:100%; background:#1C1714;"></div></div>
+            </div>
+            <div style="background:#fff;">
+              <div style="padding:7px 14px; background:rgba(0,0,0,0.02);"><div style="font-family:'DM Sans',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#C4BBAF;">Vol</div></div>
+              <div style="padding:9px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:10px; align-items:center;">
+                <div style="width:14px; height:14px; border-radius:3px; background:#1C1714; flex-shrink:0; display:flex; align-items:center; justify-content:center;"><div style="color:#F5F0E8; font-size:12px; line-height:1;">✓</div></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:14px; color:#C4BBAF; text-decoration:line-through;">Billets confirmés</div>
+              </div>
+              <div style="padding:9px 14px; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:10px; align-items:center;">
+                <div style="width:14px; height:14px; border-radius:3px; border:1.5px solid rgba(0,0,0,0.1); flex-shrink:0;"></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:14px; color:#1C1714;">Check-in en ligne</div>
+              </div>
+              <div style="padding:9px 14px; display:flex; gap:10px; align-items:center;">
+                <div style="width:14px; height:14px; border-radius:3px; border:1.5px solid rgba(0,0,0,0.1); flex-shrink:0;"></div>
+                <div style="font-family:'DM Sans',sans-serif; font-size:14px; color:#1C1714;">Heure aéroport calée</div>
+              </div>
+            </div>
+            <div style="position:absolute; bottom:0; left:0; right:0; background:#F0EBE1; padding:8px 14px; border-top:1px solid rgba(0,0,0,0.06);">
+              <div style="font-family:'DM Sans',sans-serif; font-size:11px; color:#C4BBAF; text-align:center; letter-spacing:0.5px;">Allset · synchronisé en temps réel avec Marie</div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'DM Sans',sans-serif; font-size:17px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:rgba(245,240,232,0.4);">Vue partenaire</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:18px; color:rgba(245,240,232,0.22); margin-top:4px;">Lien web · sans téléchargement</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(196,187,175,0.1); padding-top:20px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:rgba(245,240,232,0.18); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:16px; color:rgba(245,240,232,0.13);">08 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       09 — LE MARCHÉ
+  ══════════════════════════════════════════════════ -->
+  <section data-label="09 — Le Marché" data-screen-label="09" data-speaker-notes="3,5 millions de familles CSP+ en France. Plus de 10 millions de voyages famille par an. Et zéro outil dédié sur ce segment — Allset se positionne en premier." style="background:#F5F0E8; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(28,23,20,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(28,23,20,0.2); text-transform:uppercase;">Le Marché</div>
+    </div>
+
+    <div style="margin-bottom:56px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:58px; color:#1C1714; letter-spacing:-0.5px;">Un marché immédiat, un espace libre.</div>
+    </div>
+
+    <div style="flex:1; display:flex; gap:0; align-items:stretch;">
+
+      <div style="flex:1; padding-right:80px; display:flex; flex-direction:column; justify-content:center;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:116px; color:#1C1714; line-height:0.9; letter-spacing:-4px; margin-bottom:20px;">3,5M</div>
+        <div style="width:32px; height:1.5px; background:#8D5B4C; margin-bottom:20px;"></div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:30px; font-weight:500; color:#1C1714; margin-bottom:10px;">Familles CSP+<br>en France</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#A5978B; line-height:1.6;">Foyers actifs avec enfants, revenus élevés, voyageurs réguliers</div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.12); flex-shrink:0;"></div>
+
+      <div style="flex:1; padding:0 80px; display:flex; flex-direction:column; justify-content:center;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:116px; color:#1C1714; line-height:0.9; letter-spacing:-4px; margin-bottom:20px;">10M+</div>
+        <div style="width:32px; height:1.5px; background:#8D5B4C; margin-bottom:20px;"></div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:30px; font-weight:500; color:#1C1714; margin-bottom:10px;">Voyages famille<br>par an en France</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#A5978B; line-height:1.6;">3 à 4 voyages par famille CSP+, avec une organisation à recréer à chaque fois</div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.12); flex-shrink:0;"></div>
+
+      <div style="flex:1; padding-left:80px; display:flex; flex-direction:column; justify-content:center;">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:116px; color:#8D5B4C; line-height:0.9; letter-spacing:-4px; margin-bottom:20px; opacity:0.75;">0</div>
+        <div style="width:32px; height:1.5px; background:#8D5B4C; margin-bottom:20px;"></div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:30px; font-weight:500; color:#1C1714; margin-bottom:10px;">Solution dédiée<br>sur le marché</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:#A5978B; line-height:1.6;">Ni TripIt, ni Google Sheets — aucun concurrent direct sur le segment famille CSP+</div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(92,71,66,0.12); padding-top:20px; margin-top:40px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.22); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.18);">09 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       10 — FEUILLE DE ROUTE
+  ══════════════════════════════════════════════════ -->
+  <section data-label="10 — Feuille de Route" data-screen-label="10" data-speaker-notes="V1 MVP : valider que Marie utilise Allset à la place de ses Notes iPhone. V2 : rétention avec templates réutilisables et délégation. V3 : automatisation poussée, import email." style="background:#F5F0E8; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(28,23,20,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(28,23,20,0.2); text-transform:uppercase;">Feuille de Route</div>
+    </div>
+
+    <div style="margin-bottom:40px;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:58px; color:#1C1714; letter-spacing:-0.5px;">Trois étapes vers la rétention long terme.</div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:0; margin-bottom:40px;">
+      <div style="flex:1; height:3px; background:#1C1714;"></div>
+      <div style="flex:1; height:3px; background:rgba(28,23,20,0.22);"></div>
+      <div style="flex:1; height:3px; background:rgba(28,23,20,0.08);"></div>
+    </div>
+
+    <div style="flex:1; display:flex; gap:0; align-items:stretch;">
+
+      <div style="flex:1; padding-right:72px; display:flex; flex-direction:column;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <div style="background:#1C1714; color:#F5F0E8; padding:5px 14px; border-radius:2px; font-family:'DM Sans',sans-serif; font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase;">V1 — MVP</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:22px; color:#A5978B; letter-spacing:1px;">Maintenant</div>
+        </div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:42px; color:#1C1714; line-height:1.1; margin-bottom:16px; letter-spacing:-0.3px;">Validation<br>du comportement</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#A5978B; line-height:1.6; margin-bottom:24px; font-style:italic;">"Marie crée un voyage et partage le lien sans ouvrir ses Notes iPhone."</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#8D5B4C; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Création voyage + étapes</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#8D5B4C; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Checklists auto par type</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#8D5B4C; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Dashboard statut global</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#8D5B4C; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Partage partenaire par lien</div></div>
+        </div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.1); flex-shrink:0;"></div>
+
+      <div style="flex:1; padding:0 72px; display:flex; flex-direction:column; opacity:0.7;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <div style="border:1px solid rgba(28,23,20,0.25); color:#5C4742; padding:5px 14px; border-radius:2px; font-family:'DM Sans',sans-serif; font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase;">V2</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:22px; color:#A5978B; letter-spacing:1px;">6 mois</div>
+        </div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:42px; color:#1C1714; line-height:1.1; margin-bottom:16px; letter-spacing:-0.3px;">Rétention<br>long terme</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#A5978B; line-height:1.6; margin-bottom:24px; font-style:italic;">"Allset s'adapte à ma famille."</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#C4BBAF; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Templates réutilisables</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#C4BBAF; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Assignation de tâches</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#C4BBAF; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Profil famille + rappels J-30</div></div>
+        </div>
+      </div>
+
+      <div style="width:1px; background:rgba(92,71,66,0.08); flex-shrink:0;"></div>
+
+      <div style="flex:1; padding-left:72px; display:flex; flex-direction:column; opacity:0.45;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <div style="border:1px solid rgba(28,23,20,0.12); color:#A5978B; padding:5px 14px; border-radius:2px; font-family:'DM Sans',sans-serif; font-size:24px; font-weight:600; letter-spacing:2px; text-transform:uppercase;">V3</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:22px; color:#C4BBAF; letter-spacing:1px;">12–18 mois</div>
+        </div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:42px; color:#1C1714; line-height:1.1; margin-bottom:16px; letter-spacing:-0.3px;">Automatisation<br>poussée</div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#A5978B; line-height:1.6; margin-bottom:24px; font-style:italic;">"Allset anticipe — je n'ai presque rien à saisir."</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#C4BBAF; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Import email / PDF auto</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#C4BBAF; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Mode veille J-1</div></div>
+          <div style="display:flex; gap:10px; align-items:flex-start;"><span style="color:#C4BBAF; flex-shrink:0; margin-top:5px; font-size:24px;">—</span><div style="font-family:'DM Sans',sans-serif; font-size:26px; color:#5C4742; line-height:1.5;">Réactivation voyage passé</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(92,71,66,0.12); padding-top:20px; margin-top:32px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.22); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(28,23,20,0.18);">10 · 11</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════
+       11 — VISION
+  ══════════════════════════════════════════════════ -->
+  <section data-label="11 — Vision" data-screen-label="11" data-speaker-notes="L'ambition : Allset devient la référence pour l'organisation famille en voyage. Modèle freemium, viralité organique — chaque lien partagé est une invitation." style="background:#1C1714; display:flex; flex-direction:column; padding:80px 120px 60px; position:relative; overflow:hidden;">
+
+    <div style="position:absolute; right:-200px; bottom:-200px; width:800px; height:800px; border-radius:50%; border:1px solid rgba(196,187,175,0.05); pointer-events:none;"></div>
+    <div style="position:absolute; right:-120px; bottom:-120px; width:560px; height:560px; border-radius:50%; border:1px solid rgba(141,91,76,0.08); pointer-events:none;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0;">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; font-size:32px; color:rgba(245,240,232,0.28);">allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:4px; color:rgba(245,240,232,0.18); text-transform:uppercase;">Vision</div>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:1200px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:5px; color:#8D5B4C; text-transform:uppercase; margin-bottom:40px;">L'ambition</div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300; font-size:80px; color:#F5F0E8; line-height:1.1; letter-spacing:-1px; margin-bottom:52px;">"Allset devient le carnet de voyage<br>de toutes les familles."</div>
+      <div style="width:40px; height:1.5px; background:#8D5B4C; margin-bottom:52px;"></div>
+      <div style="display:flex; gap:80px;">
+        <div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:rgba(245,240,232,0.22); margin-bottom:10px;">Modèle</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:rgba(245,240,232,0.5); line-height:1.65;">Freemium · abonnement famille<br>B2B2C agences de voyage</div>
+        </div>
+        <div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:rgba(245,240,232,0.22); margin-bottom:10px;">Viralité</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:rgba(245,240,232,0.5); line-height:1.65;">Chaque lien partagé est une invitation —<br>le partenaire devient utilisateur</div>
+        </div>
+        <div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:24px; font-weight:500; letter-spacing:3px; text-transform:uppercase; color:rgba(245,240,232,0.22); margin-bottom:10px;">Contact</div>
+          <div style="font-family:'DM Sans',sans-serif; font-size:28px; color:rgba(245,240,232,0.5); line-height:1.65;">contact@allset.app<br>allset.app</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(196,187,175,0.1); padding-top:20px;">
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.18); letter-spacing:2.5px; text-transform:uppercase;">Allset</div>
+      <div style="font-family:'DM Sans',sans-serif; font-size:24px; color:rgba(245,240,232,0.13);">11 · 11</div>
+    </div>
+  </section>
+
+</x-import>
+
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,95 @@
+/* Slide-specific scaffolding. Loads on top of ../colors_and_type.css */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #1b1b1f;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Fixed 1920×1080 canvas, scaled to fit its stage ---- */
+.gge-stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gge-slide {
+  position: relative;
+  width: var(--slide-w);
+  height: var(--slide-h);
+  background: var(--bg-slide);
+  overflow: hidden;
+  transform-origin: center center;
+  flex: none;
+}
+
+/* ---- Content-slide shell ---- */
+.slide-pad {
+  position: absolute;
+  inset: 0;
+  padding: var(--margin-y) var(--margin-x);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Header (content slides) ---- */
+.slide-head { margin-bottom: 28px; }
+.slide-head .eyebrow { display: block; margin-bottom: 8px; }
+.slide-head .accent-bar { width: 64px; height: var(--accent-bar-h); background: var(--accent); margin-top: 14px; }
+
+/* ---- Footer ---- */
+.slide-foot {
+  position: absolute;
+  left: var(--margin-x);
+  right: var(--margin-x);
+  bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide-foot .num { font-family: var(--font-display); font-size: 11px; color: var(--fg-muted); letter-spacing: 1px; }
+
+/* ---- Bullet rows ---- */
+.bul { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 11px; }
+.bul .dot { width: 4px; height: 4px; background: var(--dot); margin-top: 7px; flex: none; }
+.bul.crit .dot { background: var(--accent); }
+.bul .txt { font-family: var(--font-body); font-size: 14px; line-height: 1.4; color: var(--fg-secondary); }
+.bul.crit .txt { color: var(--accent); font-weight: 600; }
+
+/* ---- Wordmark lockup ---- */
+.wm { display: flex; align-items: center; gap: 12px; }
+.wm .mono {
+  width: 52px; height: 52px; background: var(--gge-marine);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff;
+  position: relative;
+}
+.wm .mono::after { content:""; position:absolute; right:-4px; top:0; bottom:0; width:4px; background: var(--accent); }
+.wm .wm-txt { line-height: 1.1; }
+.wm .wm-txt .l1 { font-family: var(--font-display); font-weight: 700; font-size: 19px; color: var(--gge-marine); letter-spacing: .4px; }
+.wm .wm-txt .l2 { font-family: var(--font-body); font-weight: 600; font-size: 9.5px; color: var(--fg-secondary); letter-spacing: 2.5px; }
+
+/* diagonal hairline pattern on marine */
+.diag {
+  background-image: repeating-linear-gradient(45deg, transparent 0 13px, rgba(255,255,255,.06) 13px 14px);
+}
+
+/* larger, more legible columns (3-COL / wide comparative layouts) */
+.cols-lg .bul { margin-bottom: 20px; }
+.cols-lg .bul .dot { width: 6px; height: 6px; margin-top: 9px; }
+.cols-lg .bul .txt { font-size: 19px; line-height: 1.45; }
+.cols-lg .gge-marker { font-size: 26px; }
+
+/* extra-large columns (2-COL ANALYSE — most horizontal room) */
+.cols-xl .bul { margin-bottom: 24px; }
+.cols-xl .bul .dot { width: 7px; height: 7px; margin-top: 11px; }
+.cols-xl .bul .txt { font-size: 23px; line-height: 1.5; }
+
+/* process-flow narrow columns — modestly enlarged */
+.pf .bul { margin-bottom: 0; }
+.pf .bul .dot { width: 6px; height: 6px; margin-top: 9px; }
+.pf .bul .txt { font-size: 19px; line-height: 1.45; }

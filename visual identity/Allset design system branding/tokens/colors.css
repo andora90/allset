@@ -1,0 +1,45 @@
+/* Allset — Color tokens
+   All colors as CSS custom properties on :root.
+   ============================================================ */
+:root {
+  /* ── Brand palette (raw) ── */
+  --allset-obsidian:  #1C1714;   /* Dominant — fonds sombres, texte principal */
+  --allset-cream:     #F5F0E8;   /* Fond clair, texte sur sombre */
+  --allset-bark:      #8D5B4C;   /* Accent unique — CTA, lignes, highlights */
+  --allset-espresso:  #5A2A27;   /* Accent foncé — bordures actives */
+  --allset-dark-bark: #5C4742;   /* Corps de texte sur cream */
+  --allset-pebble:    #A5978B;   /* Texte secondaire */
+  --allset-stone:     #C4BBAF;   /* Texte tertiaire, dividers */
+  --allset-white:     #FFFFFF;   /* Cartes sur fond cream */
+
+  /* ── Background roles ── */
+  --bg-dark:       var(--allset-obsidian);
+  --bg-light:      var(--allset-cream);
+  --bg-card:       var(--allset-white);
+  --bg-accent:     var(--allset-bark);
+
+  /* ── Text roles ── */
+  --text-on-dark:   var(--allset-cream);
+  --text-on-light:  var(--allset-obsidian);
+  --text-body:      var(--allset-dark-bark);
+  --text-secondary: var(--allset-pebble);
+  --text-tertiary:  var(--allset-stone);
+  --text-accent:    var(--allset-bark);
+
+  /* ── Border tokens ── */
+  --border-card:    1px solid var(--allset-stone);
+  --border-subtle:  1px solid rgba(92, 71, 66, 0.12);
+  --border-accent:  2px solid var(--allset-bark);
+  --divider:        rgba(92, 71, 66, 0.12);
+
+  /* ── Alpha helpers ── */
+  --bark-08:     rgba(141, 91, 76, 0.08);
+  --bark-12:     rgba(141, 91, 76, 0.12);
+  --bark-20:     rgba(141, 91, 76, 0.20);
+  --bark-80:     rgba(141, 91, 76, 0.80);
+  --cream-10:    rgba(245, 240, 232, 0.10);
+  --cream-20:    rgba(245, 240, 232, 0.20);
+  --cream-40:    rgba(245, 240, 232, 0.40);
+  --obsidian-06: rgba(28, 23, 20, 0.06);
+  --obsidian-12: rgba(28, 23, 20, 0.12);
+}

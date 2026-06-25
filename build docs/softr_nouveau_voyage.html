@@ -1,0 +1,346 @@
+<!--
+  ALLSET — "Nouveau voyage" Custom Code Block pour Softr
+  ────────────────────────────────────────────────────────
+  Coller dans : Page Settings → Custom Code → Body (ou un Custom Code block)
+  Remplacer les valeurs dans CFG avant de mettre en production.
+
+  Dépendances :
+  - Google Fonts Playfair Display (à charger dans Settings → Custom Code → Head)
+  - Softr logged_in_user (window.logged_in_user)
+  - Airtable REST API (PAT avec scope data.records:read + data.records:write)
+-->
+
+<!-- ── FONTS ───────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ─────────────────────────────────────────────────────── -->
+<style>
+  .nv {
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    background: #F3EFE6;
+    color: #1A1816;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  .nv-hdr { padding: 16px 20px 20px; border-bottom: 1px solid #DDD6C8; }
+  .nv-back {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; letter-spacing: .3px;
+    color: #7A756D; text-decoration: none; margin-bottom: 14px;
+  }
+  .nv-back:active { opacity: .6; }
+  .nv-hdr-title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+
+  /* ── Form body ── */
+  .nv-form { padding: 24px 20px 8px; }
+
+  /* ── Field group ── */
+  .nv-group { margin-bottom: 24px; }
+  .nv-label {
+    display: block;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #7A756D; margin-bottom: 8px;
+  }
+
+  /* ── Inputs ── */
+  .nv-input,
+  .nv-select {
+    width: 100%; box-sizing: border-box;
+    background: #EBE6DC; border: 1px solid #DDD6C8; border-radius: 10px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 16px; color: #1A1816;
+    padding: 14px 16px;
+    outline: none; -webkit-appearance: none; appearance: none;
+    transition: border-color .15s;
+  }
+  .nv-input:focus, .nv-select:focus { border-color: #1A1816; }
+  .nv-input::placeholder { color: #B8B0A4; }
+
+  /* ── Date row ── */
+  .nv-date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── Select wrapper (chevron) ── */
+  .nv-sel-wrap { position: relative; }
+  .nv-sel-wrap::after {
+    content: '';
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #7A756D;
+    pointer-events: none;
+  }
+  .nv-select { padding-right: 40px; cursor: pointer; }
+
+  /* ── Hint text ── */
+  .nv-hint {
+    font-size: 12px; color: #B8B0A4; margin-top: 6px; line-height: 1.4;
+  }
+
+  /* ── Divider ── */
+  .nv-div { height: 1px; background: #DDD6C8; margin: 4px 0 24px; }
+
+  /* ── CTA ── */
+  .nv-cta { padding: 8px 20px 40px; }
+  .nv-btn {
+    display: block; width: 100%; padding: 18px;
+    background: #1A1816; color: #fff;
+    border: none; border-radius: 12px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 15px; font-weight: 600; letter-spacing: .3px;
+    cursor: pointer; text-align: center;
+    transition: opacity .15s;
+  }
+  .nv-btn:disabled { opacity: .4; cursor: default; }
+  .nv-btn:active:not(:disabled) { opacity: .75; }
+
+  /* ── Feedback message ── */
+  .nv-msg {
+    font-size: 13px; line-height: 1.5;
+    margin-top: 12px; padding: 12px 14px; border-radius: 8px;
+    display: none;
+  }
+  .nv-msg.err { display: block; background: #FFF0EE; color: #C0392B; }
+  .nv-msg.ok  { display: block; background: #F0FBF2; color: #1E7A35; }
+</style>
+
+<!-- ── MARKUP ─────────────────────────────────────────────────────── -->
+<div class="nv">
+
+  <div class="nv-hdr">
+    <a href="/mes-voyages" class="nv-back">← Mes voyages</a>
+    <div class="nv-hdr-title">Nouveau voyage</div>
+  </div>
+
+  <div class="nv-form">
+
+    <div class="nv-group">
+      <label class="nv-label" for="nv-nom">Nom du voyage</label>
+      <input class="nv-input" id="nv-nom" type="text"
+             placeholder="ex : Bretagne été, Lisbonne printemps…"
+             maxlength="200" autocomplete="off">
+    </div>
+
+    <div class="nv-group">
+      <label class="nv-label">Dates</label>
+      <div class="nv-date-row">
+        <input class="nv-input" id="nv-dep" type="date" title="Date de départ">
+        <input class="nv-input" id="nv-ret" type="date" title="Date de retour">
+      </div>
+      <div class="nv-hint">Départ · Retour — la date de retour est facultative.</div>
+    </div>
+
+    <div class="nv-group">
+      <label class="nv-label" for="nv-profil">Profil du voyage</label>
+      <div class="nv-sel-wrap">
+        <select class="nv-select" id="nv-profil">
+          <option value="">— Choisir (facultatif)</option>
+          <option value="Famille">Famille</option>
+          <option value="Couple">Couple</option>
+          <option value="Groupe">Groupe</option>
+          <option value="Solo">Solo</option>
+        </select>
+      </div>
+    </div>
+
+  </div><!-- /.nv-form -->
+
+  <div class="nv-cta">
+    <button class="nv-btn" id="nv-btn" type="button">Créer le voyage</button>
+    <div class="nv-msg" id="nv-msg"></div>
+  </div>
+
+</div><!-- /.nv -->
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+
+    TABLES: {
+      UTILISATEUR: 'tblxpU0FPlTmm9Oqo',   // 01_UTILISATEUR
+      VOYAGE:      'tblpDZfQ72KQzXhEr',   // 02_VOYAGE
+    },
+
+    PAGES: {
+      MES_VOYAGES:  '/mes-voyages',
+      DASHBOARD:    '/mon-dashboard-voyages',
+    },
+
+    FIELDS: {
+      UTILISATEUR: {
+        email: 'email',
+      },
+      VOYAGE: {
+        nomVoyage:    'nom_voyage',
+        dateDepart:   'date_depart',
+        dateRetour:   'date_retour',
+        profilVoyage: 'profil_voyage',
+        shareToken:   'share_token',
+        userId:       'user_id',            // multipleRecordLinks → 01_UTILISATEUR
+        userEmail:    'user_email',         // texte direct — utilisé par softr_mes_voyages pour filtrer
+      },
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+
+  // UUID v4 via Web Crypto — généré côté client, jamais en Airtable automation
+  function generateUUID() {
+    if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+    // Fallback compatible Safari < 15.4
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  function showMsg(text, type) {
+    const el = document.getElementById('nv-msg');
+    el.textContent = text;
+    el.className = `nv-msg ${type}`;
+  }
+
+  function hideMsg() {
+    const el = document.getElementById('nv-msg');
+    el.className = 'nv-msg';
+    el.textContent = '';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE FETCH
+  ═══════════════════════════════════════════════════════════════ */
+  const readHdrs  = { Authorization: `Bearer ${CFG.PAT}` };
+  const writeHdrs = { Authorization: `Bearer ${CFG.PAT}`, 'Content-Type': 'application/json' };
+
+  // Chercher le record utilisateur dans 01_UTILISATEUR par email.
+  // Retourne null si non trouvé ou en cas d'erreur — la création du voyage se fait quand même.
+  async function findUserRecord(email) {
+    try {
+      const formula = encodeURIComponent(`{${CFG.FIELDS.UTILISATEUR.email}}="${email}"`);
+      const url = `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.UTILISATEUR}` +
+                  `?filterByFormula=${formula}&maxRecords=1`;
+      const res = await fetch(url, { headers: readHdrs });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.records?.[0] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Créer un record dans 02_VOYAGE via POST.
+  async function createVoyage(fields) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}`,
+      {
+        method:  'POST',
+        headers: writeHdrs,
+        body:    JSON.stringify({ fields }),
+      }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Airtable ${res.status}`);
+    }
+    return res.json();   // retourne le record créé avec son id
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SUBMIT HANDLER
+  ═══════════════════════════════════════════════════════════════ */
+  async function handleSubmit() {
+    // ─ Lecture des valeurs
+    const nom    = document.getElementById('nv-nom').value.trim();
+    const dep    = document.getElementById('nv-dep').value;   // YYYY-MM-DD ou ''
+    const ret    = document.getElementById('nv-ret').value;
+    const profil = document.getElementById('nv-profil').value;
+
+    // ─ Validation légère
+    if (!nom) {
+      showMsg('Merci de saisir un nom de voyage.', 'err');
+      document.getElementById('nv-nom').focus();
+      return;
+    }
+    if (!dep) {
+      showMsg('Merci de saisir une date de départ.', 'err');
+      document.getElementById('nv-dep').focus();
+      return;
+    }
+    if (ret && ret < dep) {
+      showMsg('La date de retour doit être postérieure au départ.', 'err');
+      document.getElementById('nv-ret').focus();
+      return;
+    }
+
+    // ─ Désactiver le bouton pendant la création
+    const btn = document.getElementById('nv-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Création…';
+    hideMsg();
+
+    try {
+      // 1) Résoudre le record utilisateur pour le link user_id
+      const email = window.logged_in_user?.email || null;
+      let userLink = [];
+      if (email) {
+        const userRec = await findUserRecord(email);
+        if (userRec?.id) userLink = [userRec.id];
+      }
+
+      // 2) Générer le share_token côté client
+      const shareToken = generateUUID();
+
+      // 3) Construire le payload — champs vides exclus
+      const FV = CFG.FIELDS.VOYAGE;
+      const fields = {
+        [FV.nomVoyage]:  nom,
+        [FV.dateDepart]: dep,
+        [FV.shareToken]: shareToken,
+      };
+      if (ret)              fields[FV.dateRetour]   = ret;
+      if (profil)           fields[FV.profilVoyage] = profil;
+      if (email)            fields[FV.userEmail]    = email;
+      if (userLink.length)  fields[FV.userId]       = userLink;
+
+      // 4) Créer le voyage
+      const created = await createVoyage(fields);
+
+      // 5) Rediriger vers le dashboard du nouveau voyage
+      showMsg('Voyage créé ! Redirection…', 'ok');
+      setTimeout(() => {
+        window.location.href = `${CFG.PAGES.DASHBOARD}?recordId=${created.id}`;
+      }, 600);
+
+    } catch (err) {
+      console.error('[Allset] createVoyage:', err);
+      showMsg(`Impossible de créer le voyage — ${err.message}`, 'err');
+      btn.disabled    = false;
+      btn.textContent = 'Créer le voyage';
+    }
+  }
+
+  document.getElementById('nv-btn').addEventListener('click', handleSubmit);
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT — compatible SPA Softr
+  ═══════════════════════════════════════════════════════════════ */
+  // Rien à pré-charger ici : le form est statique.
+  // On attend juste que logged_in_user soit disponible pour l'avoir
+  // au moment du submit (findUserRecord a besoin de l'email).
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => !!window.logged_in_user?.email).catch(() => {});
+  }
+
+</script>

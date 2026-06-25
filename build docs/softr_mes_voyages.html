@@ -1,0 +1,599 @@
+<!--
+  ALLSET — "Mes voyages" Custom Code Block pour Softr
+  ─────────────────────────────────────────────────────
+  Coller dans : Page Settings → Custom Code → Body (ou un Custom Code block)
+  Remplacer les valeurs dans CONFIG avant de mettre en production.
+
+  Dépendances :
+  - Google Fonts Playfair Display (à charger dans Settings → Custom Code → Head)
+  - Softr logged-in user (window.logged_in_user)
+  - Airtable REST API (PAT read-only sur la table 02_VOYAGE)
+-->
+
+<!-- ── FONTS (si pas déjà chargées en Head global) ──────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ────────────────────────────────────────────────────── -->
+<style>
+  /* Tokens (cohérents avec le design system Allset V2) */
+  :root {
+    --cream:      #F3EFE6;
+    --cream-card: #EBE6DC;
+    --black:      #1A1816;
+    --gray:       #7A756D;
+    --light:      #B8B0A4;
+    --divider:    #DDD6C8;
+    --serif:      'Playfair Display', Georgia, serif;
+    --sans:       -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  #mv-root {
+    background: var(--cream);
+    font-family: var(--sans);
+    color: var(--black);
+    padding-bottom: 40px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Top bar ── */
+  .mv-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 24px 0;
+  }
+  .mv-wordmark {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .mv-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--black);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Title zone ── */
+  .mv-title-zone {
+    padding: 20px 24px 0;
+  }
+  .mv-h1 {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 5px;
+  }
+  .mv-subtitle {
+    font-size: 13px;
+    color: var(--gray);
+    margin: 0;
+    min-height: 18px;
+  }
+
+  /* ── CTA Créer ── */
+  .mv-cta {
+    padding: 20px 24px 0;
+  }
+  .mv-btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--black);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 12px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .mv-btn-create:active { opacity: 0.75; }
+
+  /* ── Spacer ── */
+  .mv-spacer {
+    height: 24px;
+  }
+
+  /* ── Hero card ── */
+  .mv-hero-card {
+    display: block;
+    margin: 0 24px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    height: 218px;
+    cursor: pointer;
+    text-decoration: none;
+    /* Gradient warm earth — Allset signature */
+    background: linear-gradient(155deg, #2E2010 0%, #6B4822 40%, #9C7040 60%, #3D2610 80%, #180E04 100%);
+    box-shadow: 0 10px 36px rgba(0,0,0,.22);
+    transition: transform 0.15s;
+  }
+  .mv-hero-card:active { transform: scale(0.975); }
+
+  /* Dark overlay on card */
+  .mv-hero-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.78) 0%, rgba(0,0,0,.05) 55%);
+  }
+
+  .mv-fc-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+    background: rgba(255,255,255,.16);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    border-radius: 5px;
+    padding: 5px 9px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .mv-fc-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 18px;
+    z-index: 2;
+  }
+
+  .mv-fc-eye {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    color: rgba(255,255,255,.5);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .mv-fc-city {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 42px;
+    color: #fff;
+    letter-spacing: -0.4px;
+    line-height: 1;
+  }
+
+  /* ── Trip row (sous la hero card) ── */
+  .mv-trip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 17px 24px;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--black);
+    background: #fff;
+    margin-top: 12px;
+    transition: background 0.1s;
+  }
+  .mv-trip-row:active { background: rgba(0,0,0,.02); }
+
+  .mv-tr-name { font-size: 15px; font-weight: 600; color: var(--black); }
+  .mv-tr-sub  { font-size: 13px; color: var(--gray); margin-top: 3px; }
+  .mv-tr-arr  { font-size: 16px; color: var(--light); flex-shrink: 0; margin-left: 12px; }
+
+  /* ── Other upcoming rows ── */
+  .mv-upcoming-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 17px 24px;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--black);
+    transition: background 0.1s;
+  }
+  .mv-upcoming-row:active { background: rgba(0,0,0,.02); }
+
+  /* ── Section label ── */
+  .mv-sec-lbl {
+    padding: 22px 24px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+
+  /* ── Archive item ── */
+  .mv-arch-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 24px;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--black);
+    transition: background 0.1s;
+  }
+  .mv-arch-item:active { background: rgba(0,0,0,.02); }
+
+  .mv-ai-name { font-size: 14px; font-weight: 600; color: var(--black); }
+  .mv-ai-date { font-size: 12px; color: var(--gray); margin-top: 3px; }
+  .mv-ai-tag  {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--light);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+
+  /* ── States ── */
+  .mv-loading,
+  .mv-empty,
+  .mv-error {
+    padding: 56px 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+  .mv-loading { color: var(--light); }
+  .mv-error   { color: var(--gray); }
+
+  .mv-divider { height: 1px; background: var(--divider); }
+</style>
+
+<!-- ── MARKUP ─────────────────────────────────────────────────────── -->
+<div id="mv-root">
+
+  <div class="mv-topbar">
+    <span class="mv-wordmark">Allset</span>
+    <a href="/mon-profil" class="mv-avatar" id="mv-avatar">—</a>
+  </div>
+
+  <div class="mv-title-zone">
+    <h1 class="mv-h1">Mes voyages</h1>
+    <p class="mv-subtitle" id="mv-subtitle">&nbsp;</p>
+  </div>
+
+  <div class="mv-cta">
+    <a href="/nouveau-voyage" class="mv-btn-create">+ Créer un voyage</a>
+  </div>
+
+  <div class="mv-spacer"></div>
+
+  <!-- contenu dynamique -->
+  <div id="mv-content">
+    <div class="mv-loading">Chargement de vos voyages…</div>
+  </div>
+
+</div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG — adapter ces valeurs à votre setup
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    // Airtable Personal Access Token (read-only sur la table VOYAGE)
+    // Créer sur https://airtable.com/create/tokens avec scope: data.records:read
+    PAT: 'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+
+    // IDs Airtable (base ID + table ID depuis l'URL Airtable)
+    BASE_ID:   'appFVKKftkjTeYrO7',
+    TABLE:     'tblpDZfQ72KQzXhEr',
+
+    // Pages Softr
+    PAGE_CREATE: '/nouveau-voyage',
+    PAGE_DETAIL: '/mon-dashboard-voyages',
+
+    // Noms des champs Airtable (confirmés depuis la DB)
+    FIELDS: {
+      userEmail:   'user_email',    // champ texte direct dans 02_VOYAGE
+      nomVoyage:   'nom_voyage',    // titre du voyage
+      destination: 'destination',   // ville/destination (optionnel — fallback sur nom_voyage)
+      dateDepart:  'date_depart',   // format YYYY-MM-DD
+      dateRetour:  'date_retour',   // format YYYY-MM-DD
+      profilVoyage:'profil_voyage', // single select : Famille, Groupe, Couple…
+      nbEtapes:    'nb_etapes',     // nombre d'étapes (optionnel)
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  const FR_MONTHS = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+  const FR_MONTHS_CAP = ['Jan.','Fév.','Mars','Avr.','Mai','Juin','Juil.','Août','Sep.','Oct.','Nov.','Déc.'];
+
+  function today() {
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  function parseDate(iso) {
+    if (!iso) return null;
+    // Airtable renvoie YYYY-MM-DD ou ISO complet
+    const d = new Date(iso.substring(0,10) + 'T00:00:00');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // "14 juil."
+  function shortDate(iso) {
+    const d = parseDate(iso);
+    if (!d) return '';
+    return `${d.getDate()} ${FR_MONTHS[d.getMonth()]}`;
+  }
+
+  // "Avr. 2026"
+  function monthYear(iso) {
+    const d = parseDate(iso);
+    if (!d) return '';
+    return `${FR_MONTHS_CAP[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  // "14 → 21 juil. 2026"
+  function dateRange(depIso, retIso) {
+    const dep = parseDate(depIso);
+    const ret = parseDate(retIso);
+    if (!dep) return '';
+    if (!ret) return shortDate(depIso);
+    // Même mois/année → "14 → 21 juil."
+    if (dep.getMonth() === ret.getMonth() && dep.getFullYear() === ret.getFullYear()) {
+      return `${dep.getDate()} → ${shortDate(retIso)}`;
+    }
+    // Mois différents → "14 juil. → 3 août"
+    return `${shortDate(depIso)} → ${shortDate(retIso)}`;
+  }
+
+  function isUpcoming(record) {
+    const f = record.fields;
+    const retDate  = parseDate(f[CFG.FIELDS.dateRetour]);
+    const depDate  = parseDate(f[CFG.FIELDS.dateDepart]);
+    const now = today();
+    if (retDate)  return retDate  >= now;
+    if (depDate)  return depDate  >= now;
+    return true;
+  }
+
+  function isNowActive(record) {
+    const f = record.fields;
+    const dep = parseDate(f[CFG.FIELDS.dateDepart]);
+    const ret = parseDate(f[CFG.FIELDS.dateRetour]);
+    const now = today();
+    return dep && ret && dep <= now && ret >= now;
+  }
+
+  function tripTag(record) {
+    if (isNowActive(record)) return 'EN COURS';
+    const dep = record.fields[CFG.FIELDS.dateDepart];
+    return dep ? `À VENIR — ${shortDate(dep).toUpperCase()}` : 'À VENIR';
+  }
+
+  function tripEye(record) {
+    const profil = (record.fields[CFG.FIELDS.profilVoyage] || '').toUpperCase();
+    return profil; // ex: "FAMILLE", "COUPLE", "GROUPE"
+  }
+
+  function tripSub(record) {
+    const f = record.fields;
+    const range = dateRange(f[CFG.FIELDS.dateDepart], f[CFG.FIELDS.dateRetour]);
+    const nb    = f[CFG.FIELDS.nbEtapes];
+    const etStr = nb ? ` · ${nb} étape${nb > 1 ? 's' : ''}` : '';
+    return range + etStr;
+  }
+
+  function nomVoyage(record) {
+    const f = record.fields;
+    return f[CFG.FIELDS.nomVoyage] || 'Voyage sans titre';
+  }
+
+  function destination(record) {
+    const f = record.fields;
+    // Si champ destination distinct, l'utiliser ; sinon fallback sur nom_voyage
+    return f[CFG.FIELDS.destination] || nomVoyage(record);
+  }
+
+  function detailHref(record) {
+    return `${CFG.PAGE_DETAIL}?recordId=${record.id}`;
+  }
+
+  function userInitial(user) {
+    const s = user?.nom_affiche || user?.name || user?.email || '?';
+    return s.trim().charAt(0).toUpperCase();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE FETCH
+  ═══════════════════════════════════════════════════════════════ */
+  async function fetchVoyages(email) {
+    const filter = encodeURIComponent(`{${CFG.FIELDS.userEmail}}="${email}"`);
+    const sort   = `sort[0][field]=${CFG.FIELDS.dateDepart}&sort[0][direction]=desc`;
+    const url    = `https://api.airtable.com/v0/${CFG.BASE_ID}/${encodeURIComponent(CFG.TABLE)}?filterByFormula=${filter}&${sort}&maxRecords=100`;
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${CFG.PAT}` }
+    });
+
+    if (res.status === 401) throw new Error('PAT invalide ou expiré');
+    if (!res.ok) throw new Error(`Erreur Airtable ${res.status}`);
+
+    const json = await res.json();
+    return json.records || [];
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU HTML
+  ═══════════════════════════════════════════════════════════════ */
+  function renderHeroCard(record) {
+    const eye  = tripEye(record);
+    const sub  = tripSub(record);
+    const dest = destination(record);
+    const nom  = nomVoyage(record);
+    const href = detailHref(record);
+    const tag  = tripTag(record);
+
+    return `
+      <a href="${href}" class="mv-hero-card">
+        <span class="mv-fc-tag">${tag}</span>
+        <div class="mv-fc-body">
+          ${eye ? `<div class="mv-fc-eye">${eye}</div>` : ''}
+          <div class="mv-fc-city">${dest}</div>
+        </div>
+      </a>
+      <a href="${href}" class="mv-trip-row">
+        <div>
+          <div class="mv-tr-name">${nom}</div>
+          ${sub ? `<div class="mv-tr-sub">${sub}</div>` : ''}
+        </div>
+        <span class="mv-tr-arr">→</span>
+      </a>
+    `;
+  }
+
+  function renderUpcomingRow(record) {
+    const nom  = nomVoyage(record);
+    const sub  = tripSub(record);
+    const href = detailHref(record);
+
+    return `
+      <a href="${href}" class="mv-upcoming-row">
+        <div>
+          <div class="mv-tr-name">${nom}</div>
+          ${sub ? `<div class="mv-tr-sub">${sub}</div>` : ''}
+        </div>
+        <span class="mv-tr-arr">→</span>
+      </a>
+    `;
+  }
+
+  function renderArchiveItem(record) {
+    const nom  = nomVoyage(record);
+    const dep  = record.fields[CFG.FIELDS.dateDepart];
+    const href = detailHref(record);
+    const my   = monthYear(dep);
+
+    return `
+      <a href="${href}" class="mv-arch-item">
+        <div>
+          <div class="mv-ai-name">${nom}</div>
+          ${my ? `<div class="mv-ai-date">${my}</div>` : ''}
+        </div>
+        <span class="mv-ai-tag">Terminé</span>
+      </a>
+    `;
+  }
+
+  function render(records) {
+    // Séparer : upcoming = date_retour >= aujourd'hui (ou en cours)
+    // Les trier : upcoming ASC (le plus proche en premier), archives DESC
+    const upcoming = records
+      .filter(r => isUpcoming(r))
+      .sort((a, b) => {
+        const da = parseDate(a.fields[CFG.FIELDS.dateDepart]);
+        const db = parseDate(b.fields[CFG.FIELDS.dateDepart]);
+        return (da || 0) - (db || 0); // plus proche d'abord
+      });
+
+    const archives = records
+      .filter(r => !isUpcoming(r))
+      .sort((a, b) => {
+        const da = parseDate(a.fields[CFG.FIELDS.dateDepart]);
+        const db = parseDate(b.fields[CFG.FIELDS.dateDepart]);
+        return (db || 0) - (da || 0); // plus récent d'abord
+      });
+
+    // Subtitle comptage
+    const parts = [];
+    if (upcoming.length) parts.push(`${upcoming.length} à venir`);
+    if (archives.length) parts.push(`${archives.length} archivé${archives.length > 1 ? 's' : ''}`);
+    document.getElementById('mv-subtitle').textContent = parts.join(' · ') || 'Aucun voyage';
+
+    let html = '';
+
+    if (!upcoming.length && !archives.length) {
+      html = `<div class="mv-empty">Vous n'avez pas encore de voyage.<br>Créez votre premier ici&nbsp;!</div>`;
+    } else {
+      // Hero card = 1er upcoming
+      if (upcoming.length > 0) {
+        html += renderHeroCard(upcoming[0]);
+        // Autres upcoming en ligne simple
+        for (let i = 1; i < upcoming.length; i++) {
+          html += renderUpcomingRow(upcoming[i]);
+        }
+      }
+
+      // Archives
+      if (archives.length > 0) {
+        html += `<div class="mv-sec-lbl">Archives</div>`;
+        archives.forEach(r => { html += renderArchiveItem(r); });
+      }
+    }
+
+    document.getElementById('mv-content').innerHTML = html;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT — compatible SPA Softr (pas de DOMContentLoaded)
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const user  = window.logged_in_user;
+    const email = user?.email || null;
+
+    if (!email) {
+      document.getElementById('mv-subtitle').textContent = '';
+      document.getElementById('mv-content').innerHTML =
+        `<div class="mv-error">Connectez-vous pour voir vos voyages.</div>`;
+      return;
+    }
+
+    document.getElementById('mv-avatar').textContent = userInitial(user);
+
+    try {
+      const records = await fetchVoyages(email);
+      render(records);
+    } catch (err) {
+      console.error('[Allset] fetchVoyages:', err);
+      document.getElementById('mv-content').innerHTML =
+        `<div class="mv-error">Impossible de charger vos voyages.<br>
+        <small style="color:var(--light)">${err.message}</small></div>`;
+    }
+  }
+
+  // Softr SPA : waitFor attend que logged_in_user soit peuplé par Softr.
+  // Fallback setTimeout : DOMContentLoaded ne se retrigge pas dans la SPA.
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => window.logged_in_user?.email).then(init);
+  } else {
+    setTimeout(init, 800);
+  }
+
+</script>

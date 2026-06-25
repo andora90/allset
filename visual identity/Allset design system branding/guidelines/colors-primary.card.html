@@ -1,0 +1,47 @@
+<!-- @dsCard group="Colors" viewport="700x160" subtitle="Obsidian · Cream · Bark · Espresso" name="Couleurs primaires" -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: #fff; padding: 20px 24px; -webkit-font-smoothing: antialiased; }
+    .row { display: flex; gap: 12px; }
+    .sw { flex: 1; }
+    .sw-block { height: 56px; }
+    .sw-name { font-size: 12px; font-weight: 500; color: var(--allset-obsidian); margin-top: 8px; }
+    .sw-hex { font-size: 11px; color: var(--allset-pebble); font-feature-settings: 'tnum'; }
+    .sw-role { font-size: 10px; color: var(--allset-stone); margin-top: 2px; }
+    .bordered { border: 1px solid var(--allset-stone); }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw">
+      <div class="sw-block" style="background:var(--allset-obsidian);"></div>
+      <div class="sw-name">Obsidian</div>
+      <div class="sw-hex">#1C1714</div>
+      <div class="sw-role">Fond sombre · texte principal</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block bordered" style="background:var(--allset-cream);"></div>
+      <div class="sw-name">Cream</div>
+      <div class="sw-hex">#F5F0E8</div>
+      <div class="sw-role">Fond clair · texte sur sombre</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block" style="background:var(--allset-bark);"></div>
+      <div class="sw-name">Bark</div>
+      <div class="sw-hex">#8D5B4C</div>
+      <div class="sw-role">Accent unique · CTA · lignes</div>
+    </div>
+    <div class="sw">
+      <div class="sw-block" style="background:var(--allset-espresso);"></div>
+      <div class="sw-name">Espresso</div>
+      <div class="sw-hex">#5A2A27</div>
+      <div class="sw-role">Accent foncé · bordures actives</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!--
+  ALLSET — "Ajouter une étape" Custom Code Block pour Softr
+  ──────────────────────────────────────────────────────────
+  Coller dans : Page Settings → Custom Code → Body
+  URL attendue : /ajouter-etape?prefill_voyage=recXXX
+
+  Flux :
+  1. Charge le voyage (nom + nb étapes actuelles pour l'ordre)
+  2. L'utilisateur remplit le form
+  3. Submit → POST 03_ETAPE → fetch templates 05_TEMPLATE_ITEM par type_etape
+           → batch POST des CHECKLIST_ITEM auto-générés → redirect dashboard
+-->
+
+<!-- ── FONTS ───────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ─────────────────────────────────────────────────────── -->
+<style>
+  .ae {
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    background: #F3EFE6;
+    color: #1A1816;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  .ae-hdr { padding: 16px 20px 20px; border-bottom: 1px solid #DDD6C8; }
+  .ae-back {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; letter-spacing: .3px;
+    color: #7A756D; text-decoration: none; margin-bottom: 14px;
+  }
+  .ae-back:active { opacity: .6; }
+  .ae-hdr-title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .ae-hdr-sub {
+    font-size: 13px; color: #7A756D; margin-top: 4px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+  }
+
+  /* ── Type selector (chips) ── */
+  .ae-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .ae-type-chip {
+    display: flex; flex-direction: column; align-items: flex-start;
+    padding: 14px 16px;
+    background: #EBE6DC; border: 2px solid transparent; border-radius: 12px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ae-type-chip:active { opacity: .75; }
+  .ae-type-chip.selected {
+    border-color: #1A1816;
+    background: #E3DDD3;
+  }
+  .ae-type-icon { font-size: 20px; margin-bottom: 6px; line-height: 1; }
+  .ae-type-lbl  { font-size: 13px; font-weight: 600; color: #1A1816; }
+
+  /* ── Form body ── */
+  .ae-form { padding: 24px 20px 8px; }
+
+  /* ── Field group ── */
+  .ae-group { margin-bottom: 24px; }
+  .ae-label {
+    display: block;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #7A756D; margin-bottom: 8px;
+  }
+  .ae-hint { font-size: 12px; color: #B8B0A4; margin-top: 6px; }
+
+  /* ── Inputs ── */
+  .ae-input,
+  .ae-select {
+    width: 100%; box-sizing: border-box;
+    background: #EBE6DC; border: 1px solid #DDD6C8; border-radius: 10px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 16px; color: #1A1816;
+    padding: 14px 16px;
+    outline: none; -webkit-appearance: none; appearance: none;
+    transition: border-color .15s;
+  }
+  .ae-input:focus, .ae-select:focus { border-color: #1A1816; }
+  .ae-input::placeholder { color: #B8B0A4; }
+
+  /* ── Select wrapper ── */
+  .ae-sel-wrap { position: relative; }
+  .ae-sel-wrap::after {
+    content: '';
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #7A756D;
+    pointer-events: none;
+  }
+  .ae-select { padding-right: 40px; cursor: pointer; }
+
+  /* ── Divider ── */
+  .ae-div { height: 1px; background: #DDD6C8; margin: 0 0 24px; }
+
+  /* ── Preview checklist (après sélection du type) ── */
+  .ae-preview {
+    background: #EBE6DC; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 24px;
+  }
+  .ae-preview-lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #7A756D; margin-bottom: 10px;
+  }
+  .ae-preview-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: #7A756D; padding: 4px 0;
+  }
+  .ae-preview-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    border: 1.5px solid #B8B0A4; flex-shrink: 0;
+  }
+  .ae-preview-empty { font-size: 13px; color: #B8B0A4; font-style: italic; }
+
+  /* ── CTA ── */
+  .ae-cta { padding: 8px 20px 40px; }
+  .ae-btn {
+    display: block; width: 100%; padding: 18px;
+    background: #1A1816; color: #fff;
+    border: none; border-radius: 12px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 15px; font-weight: 600; letter-spacing: .3px;
+    cursor: pointer; text-align: center;
+    transition: opacity .15s;
+  }
+  .ae-btn:disabled { opacity: .4; cursor: default; }
+  .ae-btn:active:not(:disabled) { opacity: .75; }
+
+  /* ── Feedback ── */
+  .ae-msg {
+    font-size: 13px; line-height: 1.5;
+    margin-top: 12px; padding: 12px 14px; border-radius: 8px;
+    display: none;
+  }
+  .ae-msg.err { display: block; background: #FFF0EE; color: #C0392B; }
+  .ae-msg.ok  { display: block; background: #F0FBF2; color: #1E7A35; }
+
+  /* ── Loading state ── */
+  .ae-loading {
+    padding: 48px 20px; text-align: center;
+    font-size: 14px; color: #B8B0A4;
+  }
+</style>
+
+<!-- ── MARKUP ─────────────────────────────────────────────────────── -->
+<div class="ae" id="ae-root">
+  <div class="ae-loading">Chargement…</div>
+</div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+
+    TABLES: {
+      VOYAGE:    'tblpDZfQ72KQzXhEr',   // 02_VOYAGE
+      ETAPE:     'tblH5zDlgVMerNdhi',   // 03_ETAPE
+      CHECKLIST: 'tblAksOV1ZaBl3c5R',   // 04_CHECKLIST_ITEM
+      TEMPLATE:  'tblxafVyPABgt3jpD',   // 05_TEMPLATE_ITEM
+    },
+
+    PAGES: {
+      DASHBOARD: '/mon-dashboard-voyages',
+    },
+
+    FIELDS: {
+      VOYAGE: {
+        nomVoyage: 'nom_voyage',
+        etapes:    '03_ETAPE',           // multipleRecordLinks
+      },
+      ETAPE: {
+        voyageId:           'voyage_id', // multipleRecordLinks → 02_VOYAGE
+        typeEtape:          'type_etape',
+        label:              'label',
+        dateDebut:          'date_etape',
+        dateFin:            'date_fin',
+        confirmationRef:    'confirmation_ref',
+        reservationUrl:     'reservation_url',
+        statutConfirmation: 'statut_confirmation',
+        ordre:              'ordre',
+      },
+      CHECKLIST: {
+        label:      'label',
+        etapeId:    'etape_id',          // multipleRecordLinks → 03_ETAPE
+        voyageId:   'voyage_id',         // multipleRecordLinks → 02_VOYAGE (dénormalisé)
+        templateId: 'template_id',       // multipleRecordLinks → 05_TEMPLATE_ITEM
+        isChecked:  'is_checked',
+        isCustom:   'is_custom',
+      },
+      TEMPLATE: {
+        typeEtape: 'type_etape',
+        label:     'label',
+        ordre:     'ordre',
+        isActive:  'is_active',
+      },
+    },
+
+    // Types d'étape — valeurs exactes du singleSelect Airtable
+    TYPES: [
+      { value: 'Vol',      icon: '✈', label: 'Vol'      },
+      { value: 'Hôtel',    icon: '🏨', label: 'Hôtel'   },
+      { value: 'Transfert',icon: '🚌', label: 'Transfert'},
+      { value: 'Location', icon: '🚗', label: 'Location' },
+    ],
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  function getVoyageId() {
+    const p = new URLSearchParams(window.location.search);
+    return p.get('prefill_voyage') || p.get('voyageId') || p.get('recordId') || null;
+  }
+
+  const readHdrs  = { Authorization: `Bearer ${CFG.PAT}` };
+  const writeHdrs = { Authorization: `Bearer ${CFG.PAT}`, 'Content-Type': 'application/json' };
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE FETCH
+  ═══════════════════════════════════════════════════════════════ */
+
+  // Single record — pas de fields[] (→ 422)
+  async function fetchVoyage(voyageId) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.VOYAGE}/${voyageId}`,
+      { headers: readHdrs }
+    );
+    if (!res.ok) throw new Error(`Airtable ${res.status} sur VOYAGE/${voyageId}`);
+    return res.json();
+  }
+
+  // Templates pour un type d'étape donné, triés par ordre
+  async function fetchTemplates(typeEtape) {
+    const FT = CFG.FIELDS.TEMPLATE;
+    const formula = encodeURIComponent(
+      `AND({${FT.typeEtape}}="${typeEtape}", {${FT.isActive}}=1)`
+    );
+    const params = [
+      `filterByFormula=${formula}`,
+      `fields[]=${FT.label}`,
+      `fields[]=${FT.ordre}`,
+      `sort[0][field]=${FT.ordre}`,
+      `sort[0][direction]=asc`,
+    ].join('&');
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.TEMPLATE}?${params}`,
+      { headers: readHdrs }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.records || [];
+  }
+
+  // Créer un record dans 03_ETAPE
+  async function createEtape(fields) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.ETAPE}`,
+      { method: 'POST', headers: writeHdrs, body: JSON.stringify({ fields }) }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Airtable ${res.status}`);
+    }
+    return res.json();
+  }
+
+  // Créer les CHECKLIST_ITEM en batch (max 10 par requête — limite Airtable)
+  async function createChecklistItems(etapeId, voyageId, templates) {
+    if (!templates.length) return;
+    const FC = CFG.FIELDS.CHECKLIST;
+    const FT = CFG.FIELDS.TEMPLATE;
+
+    const records = templates.map(t => ({
+      fields: {
+        [FC.label]:      t.fields[FT.label] || '—',
+        [FC.etapeId]:    [etapeId],
+        [FC.voyageId]:   [voyageId],
+        [FC.templateId]: [t.id],
+        [FC.isChecked]:  false,
+        [FC.isCustom]:   false,
+      },
+    }));
+
+    // Chunks de 10
+    for (let i = 0; i < records.length; i += 10) {
+      const chunk = records.slice(i, i + 10);
+      const res = await fetch(
+        `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.CHECKLIST}`,
+        { method: 'POST', headers: writeHdrs, body: JSON.stringify({ records: chunk }) }
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `Airtable ${res.status} sur CHECKLIST batch`);
+      }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     ÉTAT LOCAL
+  ═══════════════════════════════════════════════════════════════ */
+  let state = {
+    voyageId:      null,
+    nomVoyage:     '',
+    ordreActuel:   0,          // nb étapes existantes → ordre = ordreActuel + 1
+    typeSelected:  null,
+    templates:     [],         // templates chargés pour le type sélectionné
+    loadingTpl:    false,
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU
+  ═══════════════════════════════════════════════════════════════ */
+  function buildHTML() {
+    return `
+      <div class="ae-hdr">
+        <a href="${CFG.PAGES.DASHBOARD}?recordId=${state.voyageId}" class="ae-back">← Retour au voyage</a>
+        <div class="ae-hdr-title">Ajouter une étape</div>
+        ${state.nomVoyage ? `<div class="ae-hdr-sub">${state.nomVoyage}</div>` : ''}
+      </div>
+
+      <div class="ae-form">
+
+        <!-- Type d'étape -->
+        <div class="ae-group">
+          <span class="ae-label">Type d'étape</span>
+          <div class="ae-type-grid" id="ae-type-grid">
+            ${CFG.TYPES.map(t => `
+              <div class="ae-type-chip ${state.typeSelected === t.value ? 'selected' : ''}"
+                   data-type="${t.value}">
+                <span class="ae-type-icon">${t.icon}</span>
+                <span class="ae-type-lbl">${t.label}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Checklist auto-générée (preview) -->
+        <div id="ae-tpl-preview" style="display:none">
+          <div class="ae-preview">
+            <div class="ae-preview-lbl">Checklist générée automatiquement</div>
+            <div id="ae-tpl-items"></div>
+          </div>
+        </div>
+
+        <div class="ae-div"></div>
+
+        <!-- Label -->
+        <div class="ae-group">
+          <label class="ae-label" for="ae-label">Nom de l'étape</label>
+          <input class="ae-input" id="ae-label" type="text"
+                 placeholder="ex : Vol Paris → Barcelone, Hôtel Arts…"
+                 maxlength="200" autocomplete="off">
+        </div>
+
+        <!-- Dates début / fin -->
+        <div class="ae-group">
+          <label class="ae-label">Dates</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <div class="ae-hint" style="margin:0 0 6px">Début</div>
+              <input class="ae-input" id="ae-date-debut" type="date">
+            </div>
+            <div>
+              <div class="ae-hint" style="margin:0 0 6px">Fin <span style="font-size:11px">(facultatif)</span></div>
+              <input class="ae-input" id="ae-date-fin" type="date">
+            </div>
+          </div>
+          <div class="ae-hint">Ex : check-in / check-out hôtel, dates de location…</div>
+        </div>
+
+        <!-- Référence de réservation -->
+        <div class="ae-group">
+          <label class="ae-label" for="ae-ref">Référence de réservation <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px">(facultatif)</span></label>
+          <input class="ae-input" id="ae-ref" type="text"
+                 placeholder="ex : AY3K7F, Booking #12345…"
+                 maxlength="100" autocomplete="off">
+        </div>
+
+        <!-- URL de réservation -->
+        <div class="ae-group">
+          <label class="ae-label" for="ae-url">Lien de réservation <span style="font-weight:400;letter-spacing:0;text-transform:none;font-size:11px">(facultatif)</span></label>
+          <input class="ae-input" id="ae-url" type="url"
+                 placeholder="https://…"
+                 autocomplete="off">
+        </div>
+
+        <!-- Statut de confirmation -->
+        <div class="ae-group">
+          <label class="ae-label" for="ae-statut">Statut</label>
+          <div class="ae-sel-wrap">
+            <select class="ae-select" id="ae-statut">
+              <option value="À confirmer">À confirmer</option>
+              <option value="Confirmé">Confirmé</option>
+              <option value="Annulé">Annulé</option>
+            </select>
+          </div>
+        </div>
+
+      </div><!-- /.ae-form -->
+
+      <div class="ae-cta">
+        <button class="ae-btn" id="ae-btn" type="button">Ajouter l'étape</button>
+        <div class="ae-msg" id="ae-msg"></div>
+      </div>
+    `;
+  }
+
+  function mount() {
+    document.getElementById('ae-root').innerHTML = buildHTML();
+    bindEvents();
+  }
+
+  function showMsg(text, type) {
+    const el = document.getElementById('ae-msg');
+    el.textContent = text;
+    el.className = `ae-msg ${type}`;
+  }
+
+  function hideMsg() {
+    const el = document.getElementById('ae-msg');
+    el.className = 'ae-msg';
+    el.textContent = '';
+  }
+
+  /* ── Gestion de la sélection du type ── */
+  async function selectType(value) {
+    state.typeSelected = value;
+
+    // Mise à jour visuelle des chips
+    document.querySelectorAll('.ae-type-chip').forEach(el => {
+      el.classList.toggle('selected', el.dataset.type === value);
+    });
+
+    // Charger les templates pour ce type
+    const previewEl = document.getElementById('ae-tpl-preview');
+    const itemsEl   = document.getElementById('ae-tpl-items');
+
+    previewEl.style.display = '';
+    itemsEl.innerHTML = '<div class="ae-preview-empty">Chargement…</div>';
+
+    state.loadingTpl = true;
+    state.templates  = [];
+
+    try {
+      const tpls = await fetchTemplates(value);
+      state.templates = tpls;
+
+      if (!tpls.length) {
+        itemsEl.innerHTML = '<div class="ae-preview-empty">Aucun template pour ce type.</div>';
+      } else {
+        itemsEl.innerHTML = tpls.map(t =>
+          `<div class="ae-preview-item">
+            <div class="ae-preview-dot"></div>
+            <span>${t.fields[CFG.FIELDS.TEMPLATE.label] || '—'}</span>
+          </div>`
+        ).join('');
+      }
+    } catch {
+      itemsEl.innerHTML = '<div class="ae-preview-empty">Impossible de charger les templates.</div>';
+    }
+
+    state.loadingTpl = false;
+  }
+
+  /* ── Binding événements ── */
+  function bindEvents() {
+    document.getElementById('ae-type-grid').addEventListener('click', e => {
+      const chip = e.target.closest('.ae-type-chip');
+      if (chip) selectType(chip.dataset.type);
+    });
+
+    document.getElementById('ae-btn').addEventListener('click', handleSubmit);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SUBMIT HANDLER
+  ═══════════════════════════════════════════════════════════════ */
+  async function handleSubmit() {
+    if (!state.typeSelected) {
+      showMsg('Merci de choisir un type d\'étape.', 'err');
+      return;
+    }
+
+    const label     = document.getElementById('ae-label').value.trim();
+    const dateDebut = document.getElementById('ae-date-debut').value;
+    const dateFin   = document.getElementById('ae-date-fin').value;
+    const ref       = document.getElementById('ae-ref').value.trim();
+    const url       = document.getElementById('ae-url').value.trim();
+    const statut    = document.getElementById('ae-statut').value;
+
+    if (!label) {
+      showMsg('Merci de saisir un nom pour cette étape.', 'err');
+      document.getElementById('ae-label').focus();
+      return;
+    }
+    if (dateFin && dateDebut && dateFin < dateDebut) {
+      showMsg('La date de fin doit être postérieure au début.', 'err');
+      document.getElementById('ae-date-fin').focus();
+      return;
+    }
+
+    const btn = document.getElementById('ae-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Création…';
+    hideMsg();
+
+    try {
+      const FE = CFG.FIELDS.ETAPE;
+
+      // Ordre = nb étapes actuelles + 1
+      const ordre = state.ordreActuel + 1;
+
+      // Payload étape
+      const etapeFields = {
+        [FE.voyageId]:  [state.voyageId],
+        [FE.typeEtape]: state.typeSelected,
+        [FE.label]:     label,
+        [FE.ordre]:     ordre,
+      };
+      if (dateDebut) etapeFields[FE.dateDebut]          = dateDebut;
+      if (dateFin)   etapeFields[FE.dateFin]            = dateFin;
+      if (ref)       etapeFields[FE.confirmationRef]    = ref;
+      if (url)       etapeFields[FE.reservationUrl]     = url;
+      if (statut)    etapeFields[FE.statutConfirmation] = statut;
+
+      // 1) Créer l'étape
+      btn.textContent = 'Création de l\'étape…';
+      const created = await createEtape(etapeFields);
+
+      // 2) Créer les checklist items depuis les templates
+      if (state.templates.length) {
+        btn.textContent = `Génération de la checklist (${state.templates.length} items)…`;
+        await createChecklistItems(created.id, state.voyageId, state.templates);
+      }
+
+      // 3) Rediriger vers le dashboard
+      showMsg('Étape ajoutée ! Redirection…', 'ok');
+      setTimeout(() => {
+        window.location.href = `${CFG.PAGES.DASHBOARD}?recordId=${state.voyageId}`;
+      }, 600);
+
+    } catch (err) {
+      console.error('[Allset] ajouter-etape:', err);
+      showMsg(`Erreur : ${err.message}`, 'err');
+      btn.disabled    = false;
+      btn.textContent = 'Ajouter l\'étape';
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const voyageId = getVoyageId();
+    if (!voyageId) {
+      document.getElementById('ae-root').innerHTML =
+        '<div style="padding:48px 20px;text-align:center;color:#B8B0A4;font-size:14px">' +
+        'Ouvrez cette page depuis le dashboard d\'un voyage.</div>';
+      return;
+    }
+
+    state.voyageId = voyageId;
+
+    try {
+      const voyage = await fetchVoyage(voyageId);
+      state.nomVoyage   = voyage.fields?.[CFG.FIELDS.VOYAGE.nomVoyage] || '';
+      state.ordreActuel = (voyage.fields?.[CFG.FIELDS.VOYAGE.etapes] || []).length;
+    } catch {
+      // Non bloquant — on peut ajouter une étape même si le voyage ne charge pas
+      state.nomVoyage   = '';
+      state.ordreActuel = 0;
+    }
+
+    mount();
+  }
+
+  // Compatible SPA Softr
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => !!getVoyageId()).then(init).catch(init);
+  } else {
+    setTimeout(init, 800);
+  }
+
+</script>

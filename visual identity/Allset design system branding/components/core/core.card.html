@@ -1,0 +1,68 @@
+<!-- @dsCard group="Components" viewport="700x260" subtitle="Button · Badge · Card — variants principaux" name="Core" -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--allset-cream); padding: 20px 24px; -webkit-font-smoothing: antialiased; }
+    .section { margin-bottom: 18px; }
+    .lbl { font-size: 10px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--allset-stone); margin-bottom: 10px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    /* buttons */
+    .btn { font-family: var(--font-body); font-weight: 500; font-size: 13px; letter-spacing: 0.5px; padding: 10px 22px; cursor: pointer; border-radius: 2px; display: inline-flex; align-items: center; line-height: 1; }
+    .btn-primary   { background: var(--allset-obsidian); color: var(--allset-cream); border: none; }
+    .btn-secondary { background: transparent; color: var(--allset-obsidian); border: 1px solid var(--allset-obsidian); }
+    .btn-ghost     { background: transparent; color: var(--allset-bark); border: 1px solid var(--allset-bark); }
+    .btn-accent    { background: var(--allset-bark); color: var(--allset-cream); border: none; }
+    /* badges */
+    .badge { font-family: var(--font-body); font-weight: 500; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; display: inline-block; line-height: 1; border-radius: 2px; }
+    /* cards */
+    .card-row { display: flex; gap: 10px; }
+    .mini-card { flex: 1; padding: 14px 16px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div class="section">
+    <div class="lbl">Boutons</div>
+    <div class="row">
+      <button class="btn btn-primary">Commencer</button>
+      <button class="btn btn-secondary">En savoir plus</button>
+      <button class="btn btn-ghost">Voir le lien</button>
+      <button class="btn btn-accent">Partager</button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="lbl">Badges</div>
+    <div class="row">
+      <span class="badge" style="background:var(--allset-obsidian);color:var(--allset-cream);">Vol</span>
+      <span class="badge" style="background:transparent;color:var(--allset-obsidian);border:1px solid rgba(28,23,20,0.2);">Hôtel</span>
+      <span class="badge" style="background:var(--bark-12);color:var(--allset-bark);border:1px solid var(--bark-20);">En cours</span>
+      <span class="badge" style="background:var(--obsidian-06);color:var(--allset-dark-bark);">Location voiture</span>
+      <span class="badge" style="background:var(--allset-obsidian);color:var(--allset-cream);">✓ Calé</span>
+      <span class="badge" style="background:var(--bark-12);color:var(--allset-bark);border:1px solid var(--bark-20);">⚡ Manquant</span>
+    </div>
+  </div>
+  <div class="section">
+    <div class="lbl">Cartes</div>
+    <div class="card-row">
+      <div class="mini-card" style="background:#fff;border:1px solid var(--allset-stone);">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--allset-stone);margin-bottom:6px;">Vol · Paris → BCN</div>
+        <div style="font-family:var(--font-display);font-size:22px;color:var(--allset-obsidian);line-height:1;margin-bottom:4px;">5 / 8 validés</div>
+        <div style="font-size:11px;color:var(--allset-pebble);">Visa en attente</div>
+      </div>
+      <div class="mini-card" style="background:var(--allset-obsidian);">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(196,187,175,0.4);margin-bottom:6px;">Barcelone</div>
+        <div style="font-family:var(--font-display);font-style:italic;font-size:22px;color:var(--allset-cream);line-height:1;margin-bottom:4px;">En préparation</div>
+        <div style="font-size:11px;color:rgba(245,240,232,0.4);">3 étapes calées</div>
+      </div>
+      <div class="mini-card" style="background:var(--allset-cream);border-top:3px solid var(--allset-bark);border:1px solid var(--allset-stone);border-top:3px solid var(--allset-bark);">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--allset-bark);margin-bottom:6px;">Alerte</div>
+        <div style="font-size:14px;font-weight:500;color:var(--allset-obsidian);line-height:1.2;margin-bottom:4px;">Autorisation sortie</div>
+        <div style="font-size:11px;color:var(--allset-pebble);">Document enfants requis</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

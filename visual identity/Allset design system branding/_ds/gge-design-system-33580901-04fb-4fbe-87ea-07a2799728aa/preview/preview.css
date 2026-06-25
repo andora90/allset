@@ -1,0 +1,18 @@
+/* Preview specimen card styling. Each card body is ~700px wide. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #fff; font-family: var(--font-body); color: var(--gge-ink); -webkit-font-smoothing: antialiased; }
+.card { padding: 22px 26px; width: 100%; }
+.row { display: flex; gap: 14px; align-items: stretch; }
+.col { display: flex; flex-direction: column; gap: 6px; }
+.mono { font-family: var(--font-body); }
+
+/* color swatch */
+.sw { width: 100%; height: 64px; border-radius: 0; display: flex; align-items: flex-end; padding: 7px 8px; }
+.sw .hex { font-size: 10px; font-weight: 600; letter-spacing: .5px; }
+.chip { flex: 1; }
+.chip .name { font-family: var(--font-body); font-size: 11px; font-weight: 600; color: var(--gge-marine); margin-top: 7px; }
+.chip .role { font-family: var(--font-body); font-size: 10px; color: var(--fg-muted); margin-top: 1px; }
+.bordered { border: 1px solid var(--surface-border); }
+
+.lbl { font-family: var(--font-body); font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--fg-muted); }
+.dim { color: var(--fg-muted); font-size: 11px; }
