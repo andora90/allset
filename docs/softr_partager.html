@@ -72,7 +72,7 @@
   <!-- ÉCRAN 1 — Renseignement partenaire -->
   <div class="pt-screen" id="pt-screen-form">
     <div class="pt-hdr">
-      <a class="pt-back" id="pt-back-1" href="/mes-voyages">← Retour</a>
+      <a class="pt-back" id="pt-back-1" href="/mon-dashboard-voyages">← Retour</a>
       <div class="pt-sec-lbl">Partager</div>
       <div class="pt-nom" id="pt-nom-1"></div>
     </div>
@@ -88,7 +88,7 @@
   <!-- ÉCRAN 2 — Options de partage -->
   <div class="pt-screen" id="pt-screen-share">
     <div class="pt-hdr">
-      <a class="pt-back" id="pt-back-2" href="/mes-voyages">← Retour</a>
+      <a class="pt-back" id="pt-back-2" href="/mon-dashboard-voyages">← Retour</a>
       <div class="pt-sec-lbl">Partager</div>
       <div class="pt-nom" id="pt-nom-2"></div>
     </div>
@@ -175,7 +175,7 @@
     },
 
     PAGES: {
-      DASHBOARD:      '/mon-dashboard',
+      DASHBOARD:      '/mon-dashboard-voyages',
       VUE_PARTENAIRE: 'https://andora90.github.io/allset/vue-partenaire/',
     },
 
@@ -324,7 +324,7 @@
     const pEmail = f[F.partenaireEmail] || '';
     const dates = dateRange(f[F.dateDepart], f[F.dateRetour]);
 
-    const shareUrl = `${window.location.origin}${CFG.PAGES.VUE_PARTENAIRE}?token=${token}`;
+    const shareUrl = `${CFG.PAGES.VUE_PARTENAIRE}?token=${token}`;
 
     document.getElementById('pt-nom-2').textContent   = nom;
     document.getElementById('pt-back-2').href         = `${CFG.PAGES.DASHBOARD}?recordId=${voyage.id}`;

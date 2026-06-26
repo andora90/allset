@@ -1,0 +1,685 @@
+<!--
+  ALLSET — "Mon profil" Custom Code Block pour Softr
+  ─────────────────────────────────────────────────────
+  Coller dans : Page Settings → Custom Code → Body (ou un Custom Code block)
+  Remplacer les valeurs dans CONFIG avant de mettre en production.
+
+  Dépendances :
+  - Google Fonts Playfair Display (à charger dans Settings → Custom Code → Head)
+  - Softr logged-in user (window.logged_in_user)
+  - Airtable REST API — PAT avec scopes : data.records:read + data.records:write
+    sur la table 01_UTILISATEUR
+-->
+
+<!-- ── FONTS (si pas déjà chargées en Head global) ──────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ────────────────────────────────────────────────────── -->
+<style>
+  :root {
+    --cream:      #F3EFE6;
+    --cream-card: #EBE6DC;
+    --black:      #1A1816;
+    --gray:       #7A756D;
+    --light:      #B8B0A4;
+    --divider:    #DDD6C8;
+    --serif:      'Playfair Display', Georgia, serif;
+    --sans:       -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  #mp-root {
+    background: var(--cream);
+    font-family: var(--sans);
+    color: var(--black);
+    padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ── Top bar ── */
+  .mp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 24px 0;
+  }
+  .mp-back {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-size: 13px !important;
+    color: var(--gray) !important;
+    cursor: pointer !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  .mp-wordmark {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  /* Spacer pour aligner wordmark au centre */
+  .mp-topbar-end {
+    width: 60px;
+  }
+
+  /* ── Identity card ── */
+  .mp-identity {
+    margin: 24px 24px 0;
+    background: var(--cream-card);
+    border-radius: 14px;
+    padding: 20px 20px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .mp-avatar-lg {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--black);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .mp-ident-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--black);
+    line-height: 1.1;
+    margin-bottom: 3px;
+    min-height: 22px;
+  }
+  .mp-ident-email {
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  /* ── Section heading ── */
+  .mp-sec-lbl {
+    padding: 26px 24px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+
+  /* ── Divider ── */
+  .mp-divider {
+    height: 1px;
+    background: var(--divider);
+    margin: 0 24px;
+  }
+
+  /* ── Field block ── */
+  .mp-field {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .mp-field-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 10px;
+  }
+
+  /* ── Text input ── */
+  .mp-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--cream-card);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--black);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .mp-input:focus {
+    border-color: var(--black);
+  }
+
+  /* ── Pill selector ── */
+  .mp-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .mp-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: var(--sans) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--gray) !important;
+    background: var(--cream-card) !important;
+    border: 1px solid var(--divider) !important;
+    border-radius: 20px !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+    transition: all 0.12s !important;
+    white-space: nowrap !important;
+    user-select: none !important;
+  }
+  .mp-pill.selected {
+    background: var(--black) !important;
+    border-color: var(--black) !important;
+    color: #fff !important;
+  }
+
+  /* ── Toggle (avec_enfants) ── */
+  .mp-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mp-toggle-desc {
+    font-size: 14px;
+    color: var(--black);
+  }
+  .mp-toggle-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+  .mp-toggle-wrap {
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+  .mp-toggle {
+    width: 44px;
+    height: 26px;
+    background: var(--divider);
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  .mp-toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .mp-toggle.on {
+    background: var(--black);
+  }
+  .mp-toggle.on::after {
+    left: 21px;
+  }
+
+  /* ── Save button ── */
+  .mp-save-zone {
+    padding: 32px 24px 0;
+  }
+  .mp-btn-save {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: var(--black) !important;
+    color: #fff !important;
+    font-family: var(--sans) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    padding: 15px 24px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    transition: opacity 0.15s !important;
+  }
+  .mp-btn-save:active {
+    opacity: 0.75 !important;
+  }
+  .mp-btn-save.loading {
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+  }
+
+  /* ── Feedback ── */
+  .mp-feedback {
+    margin: 14px 24px 0;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: center;
+    display: none;
+  }
+  .mp-feedback.success {
+    background: #EDF5EE;
+    color: #2A6B30;
+    border: 1px solid #B7D9BC;
+    display: block;
+  }
+  .mp-feedback.error {
+    background: #FDEDED;
+    color: #7B2020;
+    border: 1px solid #EAB8B8;
+    display: block;
+  }
+
+  /* ── État chargement ── */
+  .mp-loading {
+    padding: 56px 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--light);
+  }
+
+  /* ── Déconnexion ── */
+  .mp-logout-zone {
+    padding: 24px 24px 0;
+  }
+  .mp-btn-logout {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    color: var(--gray) !important;
+    font-family: var(--sans) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 14px 24px !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--divider) !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+  }
+</style>
+
+<!-- ── MARKUP ─────────────────────────────────────────────────────── -->
+<div id="mp-root">
+
+  <div class="mp-topbar">
+    <div class="mp-back" id="mp-back">← Retour</div>
+    <span class="mp-wordmark">Allset</span>
+    <div class="mp-topbar-end"></div>
+  </div>
+
+  <!-- Carte identité -->
+  <div class="mp-identity">
+    <div class="mp-avatar-lg" id="mp-avatar">—</div>
+    <div>
+      <div class="mp-ident-name" id="mp-ident-name">&nbsp;</div>
+      <div class="mp-ident-email" id="mp-ident-email">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- Contenu dynamique -->
+  <div id="mp-content">
+    <div class="mp-loading">Chargement du profil…</div>
+  </div>
+
+</div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    // PAT avec scopes : data.records:read + data.records:write sur 01_UTILISATEUR
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+    TABLE:   'tblxpU0FPlTmm9Oqo', // 01_UTILISATEUR
+
+    PAGE_HOME: '/mes-voyages',
+
+    FIELDS: {
+      email:          'email',
+      nomAffiche:     'nom_afffiche', // ⚠️ typo 3×f — ne pas corriger, c'est le vrai nom dans Airtable
+      profilVoyageur: 'profil_voyageur',
+      villeDepart:    'ville_depart',
+      styleVoyage:    'style_voyage',
+      avecEnfants:    'avec_enfants',
+    },
+
+    OPTIONS: {
+      profilVoyageur: ['Solo', 'Famille', 'Groupe', 'Couple'],
+      styleVoyage:    ['Aventure', 'Culture', 'Plage', 'City break'],
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     ÉTAT LOCAL
+  ═══════════════════════════════════════════════════════════════ */
+  let state = {
+    recordId:       null,
+    nomAffiche:     '',
+    profilVoyageur: null,
+    villeDepart:    '',
+    styleVoyage:    null,
+    avecEnfants:    false,
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  function userInitial(user) {
+    const s = user?.nom_affiche || user?.name || user?.email || '?';
+    return s.trim().charAt(0).toUpperCase();
+  }
+
+  function headers() {
+    return {
+      Authorization:  `Bearer ${CFG.PAT}`,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE — FETCH profil
+  ═══════════════════════════════════════════════════════════════ */
+  async function fetchProfil(email) {
+    const filter = encodeURIComponent(`{${CFG.FIELDS.email}}="${email}"`);
+    const url    = `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLE}?filterByFormula=${filter}&maxRecords=1`;
+
+    const res = await fetch(url, { headers: headers() });
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+
+    const json = await res.json();
+    return (json.records || [])[0] || null;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE — PATCH profil
+  ═══════════════════════════════════════════════════════════════ */
+  async function saveProfil(recordId, fields) {
+    const url = `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLE}/${recordId}`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: headers(),
+      body: JSON.stringify({ fields }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `Airtable ${res.status}`);
+    }
+    return res.json();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU DU FORMULAIRE
+  ═══════════════════════════════════════════════════════════════ */
+  function renderForm() {
+    const html = `
+      <!-- Nom d'affichage -->
+      <div class="mp-sec-lbl">Nom affiché</div>
+      <div class="mp-field" style="border-top:1px solid var(--divider)">
+        <input
+          class="mp-input"
+          id="mp-nom-affiche"
+          type="text"
+          placeholder="Ex: Marie"
+          value="${escHtml(state.nomAffiche)}"
+        />
+      </div>
+
+      <!-- Profil voyageur -->
+      <div class="mp-sec-lbl">Profil voyageur</div>
+      <div class="mp-field" style="border-top:1px solid var(--divider)">
+        <div class="mp-pills" id="mp-pills-profil">
+          ${CFG.OPTIONS.profilVoyageur.map(opt => `
+            <div class="mp-pill ${opt === state.profilVoyageur ? 'selected' : ''}"
+                 data-group="profilVoyageur" data-value="${opt}">${opt}</div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Style de voyage -->
+      <div class="mp-sec-lbl">Style de voyage préféré</div>
+      <div class="mp-field" style="border-top:1px solid var(--divider)">
+        <div class="mp-pills" id="mp-pills-style">
+          ${CFG.OPTIONS.styleVoyage.map(opt => `
+            <div class="mp-pill ${opt === state.styleVoyage ? 'selected' : ''}"
+                 data-group="styleVoyage" data-value="${opt}">${opt}</div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Ville de départ -->
+      <div class="mp-sec-lbl">Ville de départ habituelle</div>
+      <div class="mp-field" style="border-top:1px solid var(--divider)">
+        <input
+          class="mp-input"
+          id="mp-ville-depart"
+          type="text"
+          placeholder="Ex: Paris"
+          value="${escHtml(state.villeDepart)}"
+        />
+      </div>
+
+      <!-- Avec enfants -->
+      <div class="mp-sec-lbl">Composition du voyage</div>
+      <div class="mp-field" style="border-top:1px solid var(--divider); border-bottom:1px solid var(--divider)">
+        <div class="mp-toggle-row">
+          <div>
+            <div class="mp-toggle-desc">Voyage avec enfants</div>
+            <div class="mp-toggle-sub">Adapte les suggestions de la checklist</div>
+          </div>
+          <div class="mp-toggle-wrap">
+            <div class="mp-toggle ${state.avecEnfants ? 'on' : ''}" id="mp-toggle-enfants"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton sauvegarder -->
+      <div class="mp-save-zone">
+        <div class="mp-btn-save" id="mp-btn-save">Enregistrer les modifications</div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="mp-feedback" id="mp-feedback"></div>
+
+      <!-- Déconnexion -->
+      <div class="mp-logout-zone">
+        <div class="mp-btn-logout" id="mp-btn-logout">Se déconnecter</div>
+      </div>
+    `;
+
+    document.getElementById('mp-content').innerHTML = html;
+    bindForm();
+  }
+
+  function escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     BINDINGS FORMULAIRE
+  ═══════════════════════════════════════════════════════════════ */
+  function bindForm() {
+    // Pills — sélection unique par groupe
+    document.querySelectorAll('.mp-pill').forEach(pill => {
+      pill.onclick = () => {
+        const group = pill.dataset.group;
+        const val   = pill.dataset.value;
+        // Désélectionner toutes les pills du même groupe
+        document.querySelectorAll(`.mp-pill[data-group="${group}"]`).forEach(p => p.classList.remove('selected'));
+        // Sélectionner celle cliquée (toggle off si déjà sélectionnée)
+        if (state[group] !== val) {
+          pill.classList.add('selected');
+          state[group] = val;
+        } else {
+          state[group] = null; // désélection
+        }
+      };
+    });
+
+    // Toggle avec_enfants
+    const toggle = document.getElementById('mp-toggle-enfants');
+    if (toggle) {
+      toggle.onclick = () => {
+        state.avecEnfants = !state.avecEnfants;
+        toggle.classList.toggle('on', state.avecEnfants);
+      };
+    }
+
+    // Bouton save
+    const btnSave = document.getElementById('mp-btn-save');
+    if (btnSave) {
+      btnSave.onclick = () => handleSave();
+    }
+
+    // Bouton déconnexion
+    const btnLogout = document.getElementById('mp-btn-logout');
+    if (btnLogout) {
+      btnLogout.onclick = () => {
+        if (typeof window.softrLogout === 'function') window.softrLogout();
+        else window.location.href = '/';
+      };
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SAVE
+  ═══════════════════════════════════════════════════════════════ */
+  async function handleSave() {
+    if (!state.recordId) {
+      showFeedback('error', 'Impossible de sauvegarder : profil introuvable dans Airtable.');
+      return;
+    }
+
+    const btn = document.getElementById('mp-btn-save');
+    if (btn) btn.classList.add('loading');
+    hideFeedback();
+
+    // Lire les valeurs inputs au moment du save
+    const nomInput  = document.getElementById('mp-nom-affiche');
+    const villeInput = document.getElementById('mp-ville-depart');
+
+    const fields = {
+      [CFG.FIELDS.nomAffiche]:     (nomInput?.value  || '').trim(),
+      [CFG.FIELDS.villeDepart]:    (villeInput?.value || '').trim(),
+      [CFG.FIELDS.avecEnfants]:    state.avecEnfants,
+    };
+
+    // Ajouter les singleSelect seulement si une valeur est sélectionnée (null = effacer)
+    if (state.profilVoyageur !== undefined) fields[CFG.FIELDS.profilVoyageur] = state.profilVoyageur || null;
+    if (state.styleVoyage    !== undefined) fields[CFG.FIELDS.styleVoyage]    = state.styleVoyage    || null;
+
+    try {
+      await saveProfil(state.recordId, fields);
+      // Mettre à jour l'affichage du nom en temps réel
+      const newNom = fields[CFG.FIELDS.nomAffiche];
+      if (newNom) {
+        document.getElementById('mp-ident-name').textContent = newNom;
+        state.nomAffiche = newNom;
+      }
+      showFeedback('success', 'Profil mis à jour avec succès.');
+    } catch (err) {
+      console.error('[Allset] saveProfil:', err);
+      showFeedback('error', `Erreur lors de la sauvegarde : ${err.message}`);
+    } finally {
+      if (btn) btn.classList.remove('loading');
+    }
+  }
+
+  function showFeedback(type, msg) {
+    const el = document.getElementById('mp-feedback');
+    if (!el) return;
+    el.className = `mp-feedback ${type}`;
+    el.textContent = msg;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function hideFeedback() {
+    const el = document.getElementById('mp-feedback');
+    if (el) el.className = 'mp-feedback';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const softrUser = window.logged_in_user;
+    const email     = softrUser?.email || null;
+
+    // Bouton retour
+    document.getElementById('mp-back').onclick = () => {
+      window.location.href = CFG.PAGE_HOME;
+    };
+
+    if (!email) {
+      document.getElementById('mp-content').innerHTML =
+        `<div style="padding:48px 24px;text-align:center;color:var(--gray);font-size:14px">
+           Connectez-vous pour accéder à votre profil.
+         </div>`;
+      return;
+    }
+
+    // Avatar + email dans la carte identité
+    document.getElementById('mp-avatar').textContent = userInitial(softrUser);
+    document.getElementById('mp-ident-email').textContent = email;
+
+    try {
+      const record = await fetchProfil(email);
+
+      if (record) {
+        const f = record.fields;
+        state.recordId       = record.id;
+        state.nomAffiche     = f[CFG.FIELDS.nomAffiche]     || softrUser?.name || '';
+        state.profilVoyageur = f[CFG.FIELDS.profilVoyageur] || null;
+        state.villeDepart    = f[CFG.FIELDS.villeDepart]    || '';
+        state.styleVoyage    = f[CFG.FIELDS.styleVoyage]    || null;
+        state.avecEnfants    = f[CFG.FIELDS.avecEnfants]    || false;
+      } else {
+        // Profil non trouvé dans Airtable — formulaire vide
+        state.recordId   = null;
+        state.nomAffiche = softrUser?.name || '';
+      }
+
+      // Afficher le nom dans la carte identité
+      document.getElementById('mp-ident-name').textContent = state.nomAffiche || email;
+
+      renderForm();
+
+    } catch (err) {
+      console.error('[Allset] fetchProfil:', err);
+      document.getElementById('mp-content').innerHTML =
+        `<div style="padding:48px 24px;text-align:center;color:var(--gray);font-size:14px;line-height:1.6">
+           Impossible de charger le profil.<br>
+           <small style="color:var(--light)">${err.message}</small>
+         </div>`;
+    }
+  }
+
+  // Softr SPA : waitFor attend que logged_in_user soit peuplé.
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => window.logged_in_user?.email).then(init);
+  } else {
+    setTimeout(init, 800);
+  }
+
+</script>

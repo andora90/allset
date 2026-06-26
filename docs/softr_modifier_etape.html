@@ -114,6 +114,20 @@
     padding: 48px 20px; text-align: center;
     font-size: 14px; color: #B8B0A4;
   }
+
+  /* ── Bouton supprimer (destructif, secondaire) ── */
+  .me-btn-del {
+    display: block; width: 100%; padding: 14px;
+    background: transparent; color: #C0392B;
+    border: 1px solid transparent; border-radius: 12px;
+    font-family: -apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; text-align: center;
+    margin-top: 8px;
+    transition: opacity .15s;
+  }
+  .me-btn-del:active { opacity: .6; }
+  .me-btn-del:disabled { opacity: .3; cursor: default; }
 </style>
 
 <!-- ── MARKUP ─────────────────────────────────────────────────────── -->
@@ -132,11 +146,13 @@
     BASE_ID: 'appFVKKftkjTeYrO7',
 
     TABLES: {
-      ETAPE: 'tblH5zDlgVMerNdhi',   // 03_ETAPE
+      ETAPE:     'tblH5zDlgVMerNdhi',   // 03_ETAPE
+      CHECKLIST: 'tblAksOV1ZaBl3c5R',   // 04_CHECKLIST_ITEM
     },
 
     PAGES: {
       DETAIL_ETAPE: '/detail-etape',
+      DASHBOARD:    '/mon-dashboard-voyages',
     },
 
     FIELDS: {
@@ -146,6 +162,8 @@
         dateDebut:          'date_etape',
         dateFin:            'date_fin',
         statutConfirmation: 'statut_confirmation',
+        voyageId:           'voyage_id',           // multipleRecordLinks → 02_VOYAGE
+        checklistItems:     '04_CHECKLIST_ITEM',   // multipleRecordLinks → 04_CHECKLIST_ITEM
       },
     },
 
@@ -185,6 +203,32 @@
     return res.json();
   }
 
+  async function deleteEtapeRecord(recordId) {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.ETAPE}/${recordId}`,
+      { method: 'DELETE', headers: readHdrs }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Airtable ${res.status}`);
+    }
+  }
+
+  async function deleteRecordsBatch(tableId, ids) {
+    for (let i = 0; i < ids.length; i += 10) {
+      const chunk = ids.slice(i, i + 10);
+      const params = chunk.map(id => `records[]=${id}`).join('&');
+      const res = await fetch(
+        `https://api.airtable.com/v0/${CFG.BASE_ID}/${tableId}?${params}`,
+        { method: 'DELETE', headers: readHdrs }
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `Airtable ${res.status}`);
+      }
+    }
+  }
+
   async function patchEtape(recordId, fields) {
     const res = await fetch(
       `https://api.airtable.com/v0/${CFG.BASE_ID}/${CFG.TABLES.ETAPE}/${recordId}`,
@@ -201,12 +245,14 @@
      ÉTAT LOCAL
   ═══════════════════════════════════════════════════════════════ */
   let state = {
-    recordId: null,
-    typeEtape: '',
-    label: '',
-    dateDebut: '',
-    dateFin: '',
-    statut: '',
+    recordId:     null,
+    typeEtape:    '',
+    label:        '',
+    dateDebut:    '',
+    dateFin:      '',
+    statut:       '',
+    voyageId:     null,
+    checklistIds: [],
   };
 
   /* ═══════════════════════════════════════════════════════════════
@@ -214,7 +260,9 @@
   ═══════════════════════════════════════════════════════════════ */
   function buildHTML() {
     const FE = CFG.FIELDS.ETAPE;
-    const backUrl = `${CFG.PAGES.DETAIL_ETAPE}?recordId=${state.recordId}`;
+    const backUrl = state.voyageId
+      ? `${CFG.PAGES.DASHBOARD}?recordId=${state.voyageId}`
+      : CFG.PAGES.DASHBOARD;
 
     const statutOptions = CFG.STATUTS.map(s =>
       `<option value="${s.value}" ${state.statut === s.value ? 'selected' : ''}>${s.label}</option>`
@@ -273,6 +321,7 @@
 
       <div class="me-cta">
         <button class="me-btn" id="me-btn" type="button">Enregistrer les modifications</button>
+        <button class="me-btn-del" id="me-btn-del" type="button">Supprimer cette étape</button>
         <div class="me-msg" id="me-msg"></div>
       </div>
     `;
@@ -289,6 +338,7 @@
   function mount() {
     document.getElementById('me-root').innerHTML = buildHTML();
     document.getElementById('me-btn').addEventListener('click', handleSubmit);
+    document.getElementById('me-btn-del').addEventListener('click', handleDelete);
   }
 
   function showMsg(text, type) {
@@ -301,6 +351,44 @@
     const el = document.getElementById('me-msg');
     el.className = 'me-msg';
     el.textContent = '';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     DELETE HANDLER
+  ═══════════════════════════════════════════════════════════════ */
+  async function handleDelete() {
+    const n = state.checklistIds.length;
+    const msg = n > 0
+      ? `Supprimer définitivement "${state.label}" et ses ${n} item${n > 1 ? 's' : ''} de checklist ?`
+      : `Supprimer définitivement "${state.label}" ?`;
+    if (!confirm(msg)) return;
+
+    const btn    = document.getElementById('me-btn');
+    const btnDel = document.getElementById('me-btn-del');
+    btn.disabled       = true;
+    btnDel.disabled    = true;
+    btnDel.textContent = 'Suppression…';
+    hideMsg();
+
+    try {
+      if (state.checklistIds.length) {
+        await deleteRecordsBatch(CFG.TABLES.CHECKLIST, state.checklistIds);
+      }
+      await deleteEtapeRecord(state.recordId);
+
+      showMsg('Étape supprimée. Redirection…', 'ok');
+      setTimeout(() => {
+        window.location.href = state.voyageId
+          ? `${CFG.PAGES.DASHBOARD}?recordId=${state.voyageId}`
+          : CFG.PAGES.DASHBOARD;
+      }, 600);
+    } catch (err) {
+      console.error('[Allset] supprimer-etape:', err);
+      showMsg(`Erreur : ${err.message}`, 'err');
+      btn.disabled       = false;
+      btnDel.disabled    = false;
+      btnDel.textContent = 'Supprimer cette étape';
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -371,11 +459,13 @@
       const FE    = CFG.FIELDS.ETAPE;
       const f     = etape.fields || {};
 
-      state.typeEtape = f[FE.typeEtape]          || '';
-      state.label     = f[FE.label]              || '';
-      state.dateDebut = f[FE.dateDebut]          || '';
-      state.dateFin   = f[FE.dateFin]            || '';
-      state.statut    = f[FE.statutConfirmation] || '';
+      state.typeEtape    = f[FE.typeEtape]          || '';
+      state.label        = f[FE.label]              || '';
+      state.dateDebut    = f[FE.dateDebut]          || '';
+      state.dateFin      = f[FE.dateFin]            || '';
+      state.statut       = f[FE.statutConfirmation] || '';
+      state.voyageId     = (f[FE.voyageId] || [])[0] || null;
+      state.checklistIds = f[FE.checklistItems]     || [];
 
       mount();
     } catch (err) {

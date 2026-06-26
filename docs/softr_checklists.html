@@ -1,0 +1,553 @@
+<!--
+  ALLSET — "Mes checklists" Custom Code Block pour Softr
+  ────────────────────────────────────────────────────────
+  Vue transverse : tous les CHECKLIST_ITEM non cochés de l'utilisateur,
+  groupés par voyage puis par étape, triés par étape.ordre.
+
+  Coller dans : Page Settings → Custom Code → Body (ou un Custom Code block)
+  Slug Softr suggéré : /mes-checklists
+
+  Dépendances :
+  - Google Fonts Playfair Display (charger dans Settings → Custom Code → Head)
+  - Softr logged-in user (window.logged_in_user)
+  - Airtable REST API (PAT read-only sur 02_VOYAGE, 03_ETAPE, 04_CHECKLIST_ITEM)
+
+  Fetch strategy (3 étapes) :
+  1. GET /02_VOYAGE filtered by user_email → liste des voyages + IDs checklist liés
+  2. Batch-fetch /04_CHECKLIST_ITEM par RECORD_ID() → filtrer is_checked client-side
+  3. Batch-fetch /03_ETAPE par RECORD_ID() → label, type_etape, ordre, date_etape
+  Règle : jamais ARRAYJOIN sur champ linked pour filtrer (retourne display values, pas IDs).
+-->
+
+<!-- ── FONTS ──────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<!-- ── STYLES ────────────────────────────────────────────────────── -->
+<style>
+  :root {
+    --cream:      #F3EFE6;
+    --cream-card: #EBE6DC;
+    --black:      #1A1816;
+    --gray:       #7A756D;
+    --light:      #B8B0A4;
+    --divider:    #DDD6C8;
+    --serif:      'Playfair Display', Georgia, serif;
+    --sans:       -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  #cl-root {
+    background: var(--cream);
+    font-family: var(--sans);
+    color: var(--black);
+    padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Top bar ── */
+  .cl-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 24px 0;
+  }
+  .cl-wordmark {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .cl-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--black);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Title zone ── */
+  .cl-title-zone {
+    padding: 20px 24px 0;
+  }
+  .cl-h1 {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 0 5px;
+  }
+  .cl-subtitle {
+    font-size: 13px;
+    color: var(--gray);
+    margin: 0;
+    min-height: 18px;
+  }
+
+  /* ── Spacer ── */
+  .cl-spacer { height: 24px; }
+
+  /* ── Voyage section header ── */
+  .cl-voyage-header {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    padding: 20px 24px 8px !important;
+    cursor: pointer !important;
+  }
+  .cl-voyage-name {
+    font-family: var(--serif) !important;
+    font-style: italic !important;
+    font-size: 20px !important;
+    font-weight: 400 !important;
+    color: var(--black) !important;
+    line-height: 1.2 !important;
+  }
+  .cl-voyage-dates {
+    font-size: 12px !important;
+    color: var(--light) !important;
+    white-space: nowrap !important;
+    margin-left: 12px !important;
+    flex-shrink: 0 !important;
+  }
+  .cl-voyage-arr {
+    font-size: 14px !important;
+    color: var(--light) !important;
+    margin-left: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* ── Étape sub-header ── */
+  .cl-etape-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 24px 6px !important;
+    cursor: pointer !important;
+  }
+  .cl-etape-header:active { opacity: 0.7 !important; }
+
+  .cl-etape-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: var(--light) !important;
+    flex-shrink: 0 !important;
+  }
+  .cl-etape-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.2px !important;
+    text-transform: uppercase !important;
+    color: var(--gray) !important;
+  }
+  .cl-etape-date {
+    font-size: 11px !important;
+    color: var(--light) !important;
+    margin-left: auto !important;
+  }
+  .cl-etape-arr {
+    font-size: 12px !important;
+    color: var(--light) !important;
+    margin-left: 4px !important;
+  }
+
+  /* ── Checklist item row ── */
+  .cl-item-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 11px 24px 11px 40px !important;
+    border-bottom: 1px solid var(--divider) !important;
+    cursor: pointer !important;
+    transition: background 0.1s !important;
+  }
+  .cl-item-row:active { background: rgba(0,0,0,.02) !important; }
+
+  .cl-item-circle {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid var(--light) !important;
+    flex-shrink: 0 !important;
+    margin-top: 1px !important;
+  }
+  .cl-item-label {
+    font-size: 14px !important;
+    color: var(--black) !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ── Section divider between voyages ── */
+  .cl-section-divider {
+    height: 1px;
+    background: var(--divider);
+    margin: 8px 0 0;
+  }
+
+  /* ── States ── */
+  .cl-loading,
+  .cl-empty,
+  .cl-error {
+    padding: 56px 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+  .cl-loading { color: var(--light); }
+
+  /* ── CTA retour voyages ── */
+  .cl-back {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: transparent !important;
+    color: var(--gray) !important;
+    font-family: var(--sans) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    padding: 10px 0 !important;
+    margin: 12px 24px 0 !important;
+    cursor: pointer !important;
+    border: none !important;
+    text-decoration: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+</style>
+
+<!-- ── MARKUP ─────────────────────────────────────────────────────── -->
+<div id="cl-root">
+
+  <div class="cl-topbar">
+    <span class="cl-wordmark">Allset</span>
+    <div class="cl-avatar" id="cl-avatar" onclick="window.location.href='/mon-profil'" style="cursor:pointer">—</div>
+  </div>
+
+  <div class="cl-title-zone">
+    <h1 class="cl-h1">Mes checklists</h1>
+    <p class="cl-subtitle" id="cl-subtitle">&nbsp;</p>
+  </div>
+
+  <div class="cl-spacer"></div>
+
+  <!-- contenu dynamique -->
+  <div id="cl-content">
+    <div class="cl-loading">Chargement de vos tâches…</div>
+  </div>
+
+</div>
+
+<!-- ── LOGIC ──────────────────────────────────────────────────────── -->
+<script type="module">
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════════════════════════════════ */
+  const CFG = {
+    PAT:     'patbM2QbcF7qIFBo3.a29d7f2185dfdbc2d08d716ae7851b05b290ce8a01ccb4b3a54bf4fa36d815f9',
+    BASE_ID: 'appFVKKftkjTeYrO7',
+    TABLES: {
+      VOYAGE:    'tblpDZfQ72KQzXhEr',  // 02_VOYAGE
+      ETAPE:     'tblH5zDlgVMerNdhi',  // 03_ETAPE
+      CHECKLIST: 'tblAksOV1ZaBl3c5R',  // 04_CHECKLIST_ITEM
+    },
+    PAGES: {
+      DETAIL_ETAPE: '/detail-etape',
+      DASHBOARD:    '/mon-dashboard-voyages',
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════ */
+  const AT_HEADERS = { Authorization: `Bearer ${CFG.PAT}` };
+  const AT_BASE = `https://api.airtable.com/v0/${CFG.BASE_ID}`;
+
+  const FR_MONTHS = ['jan.','fév.','mars','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+
+  function parseDate(iso) {
+    if (!iso) return null;
+    const d = new Date(iso.substring(0, 10) + 'T00:00:00');
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function shortDate(iso) {
+    const d = parseDate(iso);
+    if (!d) return '';
+    return `${d.getDate()} ${FR_MONTHS[d.getMonth()]}`;
+  }
+
+  function dateRange(depIso, retIso) {
+    const dep = parseDate(depIso);
+    const ret = parseDate(retIso);
+    if (!dep) return '';
+    if (!ret) return shortDate(depIso);
+    if (dep.getMonth() === ret.getMonth() && dep.getFullYear() === ret.getFullYear()) {
+      return `${dep.getDate()} → ${shortDate(retIso)}`;
+    }
+    return `${shortDate(depIso)} → ${shortDate(retIso)}`;
+  }
+
+  function userInitial(user) {
+    const s = user?.nom_affiche || user?.name || user?.email || '?';
+    return s.trim().charAt(0).toUpperCase();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     AIRTABLE FETCH
+  ═══════════════════════════════════════════════════════════════ */
+
+  // Batch-fetch records by their own RECORD_ID — IDs split into groups of 40
+  // to stay within URL length limits.
+  async function fetchByIds(tableId, ids) {
+    if (!ids.length) return [];
+    const BATCH = 40;
+    const results = [];
+    for (let i = 0; i < ids.length; i += BATCH) {
+      const batch = ids.slice(i, i + BATCH);
+      const formula = `OR(${batch.map(id => `RECORD_ID()="${id}"`).join(',')})`;
+      const url = `${AT_BASE}/${tableId}?filterByFormula=${encodeURIComponent(formula)}&maxRecords=200`;
+      const res = await fetch(url, { headers: AT_HEADERS });
+      if (!res.ok) throw new Error(`Airtable ${res.status} sur ${tableId}`);
+      const json = await res.json();
+      results.push(...(json.records || []));
+    }
+    return results;
+  }
+
+  async function fetchVoyages(email) {
+    const formula = `{user_email}="${email}"`;
+    const url = `${AT_BASE}/${CFG.TABLES.VOYAGE}?filterByFormula=${encodeURIComponent(formula)}&maxRecords=100`;
+    const res = await fetch(url, { headers: AT_HEADERS });
+    if (res.status === 401) throw new Error('PAT invalide ou expiré');
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    return (await res.json()).records || [];
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     BUILD DATA TREE
+  ═══════════════════════════════════════════════════════════════ */
+  async function buildTree(email) {
+    // 1 — Voyages de l'utilisateur
+    const voyages = await fetchVoyages(email);
+    if (!voyages.length) return null;
+
+    // 2 — Tous les IDs de checklist liés aux voyages (via le champ linked 04_CHECKLIST_ITEM)
+    const allChecklistIds = [];
+    const voyageChecklistMap = {}; // voyageId → [checklistId, ...]
+    for (const v of voyages) {
+      const linked = v.fields['04_CHECKLIST_ITEM'] || [];
+      voyageChecklistMap[v.id] = linked;
+      for (const id of linked) {
+        if (!allChecklistIds.includes(id)) allChecklistIds.push(id);
+      }
+    }
+    if (!allChecklistIds.length) return { voyages, etapes: {}, items: [], uncheckedTotal: 0 };
+
+    // 3 — Batch-fetch tous ces checklist items
+    const allItems = await fetchByIds(CFG.TABLES.CHECKLIST, allChecklistIds);
+
+    // Garder uniquement les non cochés (is_checked checkbox : true = coché, absent = non coché)
+    const unchecked = allItems.filter(item => item.fields['is_checked'] !== true);
+    if (!unchecked.length) return { voyages, etapes: {}, items: [], uncheckedTotal: 0 };
+
+    // 4 — Collecter les étape IDs uniques depuis les items non cochés
+    const etapeIdsSet = new Set();
+    for (const item of unchecked) {
+      const linked = item.fields['etape_id'] || [];
+      if (linked[0]) etapeIdsSet.add(linked[0]);
+    }
+    const etapeIds = [...etapeIdsSet];
+    const etapesArr = await fetchByIds(CFG.TABLES.ETAPE, etapeIds);
+
+    // Indexer les étapes par ID
+    const etapes = {};
+    for (const e of etapesArr) {
+      etapes[e.id] = e;
+    }
+
+    return { voyages, etapes, items: unchecked, uncheckedTotal: unchecked.length };
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDU
+  ═══════════════════════════════════════════════════════════════ */
+
+  // Construit l'arbre voyage → étape → items pour le rendu
+  function buildDisplayTree(voyages, etapes, items) {
+    // Map etapeId → voyageId (en lisant le champ voyage_id du voyage qui contient l'étape)
+    // Plus simple : pour chaque item, on connaît etape_id et voyage_id via les linked fields
+    // CHECKLIST_ITEM.voyage_id = multipleRecordLinks → premier élément = voyageId
+
+    // Index : voyageId → { record, etapes: { etapeId → { record, items[] } } }
+    const tree = {};
+
+    for (const v of voyages) {
+      tree[v.id] = { record: v, etapes: {} };
+    }
+
+    for (const item of items) {
+      const etapeId = (item.fields['etape_id'] || [])[0];
+      const voyageId = (item.fields['voyage_id'] || [])[0];
+      if (!etapeId || !voyageId) continue;
+      if (!tree[voyageId]) continue;
+
+      if (!tree[voyageId].etapes[etapeId]) {
+        tree[voyageId].etapes[etapeId] = { record: etapes[etapeId] || null, items: [] };
+      }
+      tree[voyageId].etapes[etapeId].items.push(item);
+    }
+
+    // Supprimer les voyages sans items
+    for (const vId of Object.keys(tree)) {
+      if (!Object.keys(tree[vId].etapes).length) delete tree[vId];
+    }
+
+    return tree;
+  }
+
+  function etapeDisplayLabel(etapeRecord) {
+    if (!etapeRecord) return 'Étape';
+    const f = etapeRecord.fields;
+    const label = f['label'] || f['type_etape'] || 'Étape';
+    return label;
+  }
+
+  function renderTree(tree, voyages) {
+    // Conserver l'ordre des voyages tel que renvoyé par Airtable (tri par date_depart)
+    const orderedVoyageIds = voyages
+      .map(v => v.id)
+      .filter(id => tree[id]);
+
+    if (!orderedVoyageIds.length) {
+      return `<div class="cl-empty">Toutes vos tâches sont cochées !<br>Bravo, vous êtes prêt·e.</div>`;
+    }
+
+    let html = '';
+
+    orderedVoyageIds.forEach((vId, vIdx) => {
+      const vNode = tree[vId];
+      const f = vNode.record.fields;
+      const nomVoyage = f['nom_voyage'] || 'Voyage sans titre';
+      const depIso    = f['date_depart'];
+      const retIso    = f['date_retour'];
+      const dateStr   = dateRange(depIso, retIso);
+      const dashHref  = `${CFG.PAGES.DASHBOARD}?recordId=${vId}`;
+
+      if (vIdx > 0) html += `<div class="cl-section-divider"></div>`;
+
+      html += `
+        <div class="cl-voyage-header" onclick="window.location.href='${dashHref}'">
+          <span class="cl-voyage-name">${nomVoyage}</span>
+          ${dateStr ? `<span class="cl-voyage-dates">${dateStr}</span>` : ''}
+          <span class="cl-voyage-arr">→</span>
+        </div>
+      `;
+
+      // Étapes triées par ordre
+      const etapeEntries = Object.entries(vNode.etapes);
+      etapeEntries.sort(([, a], [, b]) => {
+        const oA = a.record?.fields?.['ordre'] ?? 9999;
+        const oB = b.record?.fields?.['ordre'] ?? 9999;
+        return oA - oB;
+      });
+
+      for (const [etapeId, eNode] of etapeEntries) {
+        const eLabel   = etapeDisplayLabel(eNode.record);
+        const eDate    = eNode.record?.fields?.['date_etape'];
+        const eDateStr = eDate ? shortDate(eDate) : '';
+        const etapeHref = `${CFG.PAGES.DETAIL_ETAPE}?recordId=${etapeId}`;
+
+        html += `
+          <div class="cl-etape-header" onclick="window.location.href='${etapeHref}'">
+            <span class="cl-etape-dot"></span>
+            <span class="cl-etape-label">${eLabel}</span>
+            ${eDateStr ? `<span class="cl-etape-date">${eDateStr}</span>` : ''}
+            <span class="cl-etape-arr">→</span>
+          </div>
+        `;
+
+        for (const item of eNode.items) {
+          const label = item.fields['label'] || '—';
+          html += `
+            <div class="cl-item-row" onclick="window.location.href='${etapeHref}'">
+              <span class="cl-item-circle"></span>
+              <span class="cl-item-label">${label}</span>
+            </div>
+          `;
+        }
+      }
+    });
+
+    return html;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════ */
+  async function init() {
+    const user  = window.logged_in_user;
+    const email = user?.email || null;
+
+    if (!email) {
+      document.getElementById('cl-subtitle').textContent = '';
+      document.getElementById('cl-content').innerHTML =
+        `<div class="cl-error">Connectez-vous pour voir vos checklists.</div>`;
+      return;
+    }
+
+    document.getElementById('cl-avatar').textContent = userInitial(user);
+
+    try {
+      const data = await buildTree(email);
+
+      if (!data) {
+        document.getElementById('cl-subtitle').textContent = 'Aucun voyage';
+        document.getElementById('cl-content').innerHTML =
+          `<div class="cl-empty">Vous n'avez pas encore de voyage.<br>
+           <span onclick="window.location.href='/nouveau-voyage'"
+             style="color:var(--black);font-weight:700;text-decoration:underline;cursor:pointer">
+             Créer un voyage
+           </span></div>`;
+        return;
+      }
+
+      const { voyages, etapes, items, uncheckedTotal } = data;
+
+      // Subtitle
+      if (uncheckedTotal === 0) {
+        document.getElementById('cl-subtitle').textContent = 'Tout est fait !';
+      } else {
+        const s = uncheckedTotal > 1 ? 's' : '';
+        document.getElementById('cl-subtitle').textContent = `${uncheckedTotal} tâche${s} en attente`;
+      }
+
+      const tree = buildDisplayTree(voyages, etapes, items);
+      document.getElementById('cl-content').innerHTML = renderTree(tree, voyages);
+
+    } catch (err) {
+      console.error('[Allset] checklists:', err);
+      document.getElementById('cl-content').innerHTML =
+        `<div class="cl-error">Impossible de charger vos checklists.<br>
+        <small style="color:var(--light)">${err.message}</small></div>`;
+    }
+  }
+
+  // Softr SPA — waitFor attend que logged_in_user soit peuplé, fallback setTimeout
+  if (typeof window.SOFTR_PAGE?.waitFor === 'function') {
+    window.SOFTR_PAGE.waitFor(() => window.logged_in_user?.email).then(init);
+  } else {
+    setTimeout(init, 800);
+  }
+
+</script>
